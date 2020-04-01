@@ -104,9 +104,44 @@ def get_date_of_first_case(df: pd.DataFrame, state: str="Washington") -> str:
     return earliest_case
 
 
+def get_date_of_first_death(df: pd.DataFrame, state: str="Washington") -> str:
+    state_df = pd.DataFrame(df[df['state'] == state])
+    state_df = state_df[state_df['deaths'] != 0]
+    earliest_case = state_df.iloc[0]['date']
+    return earliest_case
+
+
 def get_data_since_date(df: pd.DataFrame, date: str) -> pd.DataFrame:
     data_after_date = df[df['date'] >= date]
     return data_after_date
+
+
+def five_day_moving_average(iterable):
+    casted = list(iterable)
+    
+    moving_ave = []
+    for i in range(len(casted)):
+        if 1 > i > (len(casted) - 2):
+            moving_ave.append(None)
+        else:
+            before_after = casted[i-2:i]
+            before_after.extend(casted[i:i+3])
+            moving_ave.append(pd.Series(before_after).mean())
+    return moving_ave
+    
+    
+def nine_day_moving_average(iterable):
+    casted = list(iterable)
+    
+    moving_ave = []
+    for i in range(len(casted)):
+        if 3 > i > (len(casted) - 5):
+            moving_ave.append(None)
+        else:
+            before_after = casted[i-4:i]
+            before_after.extend(casted[i:i+5])
+            moving_ave.append(pd.Series(before_after).mean())
+    return moving_ave
 
 
 def plot_cases(df):
@@ -291,8 +326,8 @@ def _plot_new_deaths_county(df):
     plt.ylabel('New Deaths')
     plt.xlabel('Date')
     plt.tight_layout()
-    
-    
+
+
 def plot_state_cases_vs_deaths(df):
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'cases', data=df, color="b", legend=None)
@@ -312,31 +347,49 @@ def plot_state_cases_vs_deaths(df):
     plt.xlabel('Date')
     plt.tight_layout()
     
-    """
-    ax = df.plot(x="date", y="cases", legend=False)
-    ax2 = ax.twinx()
-    df.plot(x="date", y="deaths", ax=ax2, legend=False, color="r")
-    ax.figure.legend()
-    plt.show()
     
-    
-    num_states = len(list(set(df['state'])))
-    
-    if num_states > 27:
-        num_col = 2
-    else:
-        num_col = 1
+def _plot_state_moving_average(df):
     
     plt.figure(figsize=(12, 6))
-    
-    ax = sns.lineplot('date', 'cases', data=df)
-    ax = sns.lineplot('date', 'deaths', data=df)
-    ax.lines[0].set_linestyle("--")
-    
-    plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
-    plt.xticks(size=6, rotation=90)
+    sns.lineplot('date', 'new_cases', data=df, color="b", legend=None)
     plt.ylabel('Cases')
+    plt.xticks(rotation=90)
+    
+    sns.lineplot('date', 'moving_ave', data=df, color="r", legend=None)
+    
+    
+    blue_line = mlines.Line2D([], [], color='blue', marker=None, label='New Cases')
+    red_line = mlines.Line2D([], [], color='red', marker=None, label="Fitted")
+    plt.legend(loc='upper left', handles=[blue_line, red_line])
+    
+    plt.ylabel('Fitted')
     plt.xlabel('Date')
     plt.tight_layout()
-    """
+    
+    
+def _plot_county_moving_average(df):
+    
+    plt.figure(figsize=(12, 6))
+    sns.lineplot('date', 'new_cases', data=df, color="b", legend=None)
+    plt.ylabel('Cases')
+    plt.xticks(rotation=90)
+    
+    sns.lineplot('date', 'moving_ave', data=df, color="r", legend=None)
+    
+    
+    blue_line = mlines.Line2D([], [], color='blue', marker=None, label='New Cases')
+    red_line = mlines.Line2D([], [], color='red', marker=None, label="Fitted")
+    plt.legend(loc='upper left', handles=[blue_line, red_line])
+    
+    plt.ylabel('Fitted')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+    
+
+    
+    
+    
+    
+
     
