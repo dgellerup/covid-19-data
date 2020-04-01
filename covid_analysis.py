@@ -8,6 +8,7 @@ Created on Mon Mar 30 15:46:19 2020
 
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -71,7 +72,33 @@ def load_county_data() -> pd.DataFrame:
     return county_data
 
 
-def get_most_affected_states(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+def states_with_most_cases(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    most_recent_df.sort_values('cases', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_states_full_data = df[df['state'].isin(most_affected['state'])]
+    
+    return most_affected_states_full_data
+
+
+def counties_with_most_cases(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    most_recent_df.sort_values('casess', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_counties_full_data = df[df['county, state'].isin(most_affected['county, state'])]
+    
+    return most_affected_counties_full_data
+
+
+def states_with_most_deaths(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
     most_recent_date = df['date'].max()
     
     most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
@@ -84,7 +111,7 @@ def get_most_affected_states(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
     return most_affected_states_full_data
 
 
-def get_most_affected_counties(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+def counties_with_most_deaths(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
     most_recent_date = df['date'].max()
     
     most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
@@ -142,6 +169,20 @@ def nine_day_moving_average(iterable):
             before_after.extend(casted[i:i+5])
             moving_ave.append(pd.Series(before_after).mean())
     return moving_ave
+
+
+def fit_curve(iterable, deg):
+    "This more or less does not work but I want to leave it here for future ref."
+    x = range(0, len(iterable))
+    y = iterable
+    
+    z = np.polyfit(x, y, deg)
+    
+    p = np.poly1d(z)
+    
+    fit = [int(p(f)) for f in x]
+    
+    return fit
 
 
 def plot_cases(df):
