@@ -1,8 +1,8 @@
 # Analyzing NYTimes Data With Python  
 In this forked repo from the New York Times, I've written a module in Python with helpful functions for quickly analyzing COVID-19 data.  
 
-Case Counts for 5 Most-Affected States Since March 1, 2020
-![Case Counts for 5 Most-Affected States Since March 1, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
+Case Counts for 5 Most-Affected States From March 1, 2020 to April 1, 2020
+![Case Counts for 5 Most-Affected States From March 1, 2020 to April 1, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
 
 # Coronavirus (Covid-19) Data in the United States
 
