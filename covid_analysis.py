@@ -446,6 +446,7 @@ def make_wisconsin_county_plots() -> None:
     multiplier = int(len(cc.fire)/len(winow))
     palette = [cc.fire[i*multiplier] for i in range(len(winow))]
     endpts = list(np.linspace(0, max(winow['cases']), len(palette) - 1))
+    endpts = [int(x) for x in endpts]
     
     images = []
     
