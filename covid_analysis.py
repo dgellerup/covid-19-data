@@ -6,11 +6,14 @@ Created on Mon Mar 30 15:46:19 2020
 @author: dgelleru
 """
 
+from typing import Iterable, List
+
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
 
 def load_state_data() -> pd.DataFrame:
     state_data = pd.read_csv('us-states.csv')
@@ -143,7 +146,7 @@ def get_data_since_date(df: pd.DataFrame, date: str) -> pd.DataFrame:
     return data_after_date
 
 
-def five_day_moving_average(iterable):
+def five_day_moving_average(iterable: Iterable) -> List[float]:
     casted = list(iterable)
     
     moving_ave = []
@@ -157,7 +160,7 @@ def five_day_moving_average(iterable):
     return moving_ave
     
     
-def nine_day_moving_average(iterable):
+def nine_day_moving_average(iterable: Iterable) -> List[float]:
     casted = list(iterable)
     
     moving_ave = []
@@ -171,7 +174,7 @@ def nine_day_moving_average(iterable):
     return moving_ave
 
 
-def fit_curve(iterable, deg):
+def fit_curve(iterable: Iterable, deg: int) -> List[int]:
     "This more or less does not work but I want to leave it here for future ref."
     x = range(0, len(iterable))
     y = iterable
@@ -185,21 +188,21 @@ def fit_curve(iterable, deg):
     return fit
 
 
-def plot_cases(df):
+def plot_cases(df: pd.DataFrame) -> None:
     if "county, state" in df.columns:
         _plot_county_cases(df)
     else:
         _plot_state_cases(df)
         
         
-def plot_deaths(df):
+def plot_deaths(df: pd.DataFrame) -> None:
     if "county, state" in df.columns:
         _plot_county_deaths(df)
     else:
         _plot_state_deaths(df)
 
 
-def _plot_state_cases(df):
+def _plot_state_cases(df: pd.DataFrame) -> None:
     
     num_states = len(list(set(df['state'])))
     
@@ -219,7 +222,7 @@ def _plot_state_cases(df):
     plt.tight_layout()
     
 
-def _plot_state_deaths(df):
+def _plot_state_deaths(df: pd.DataFrame) -> None:
     
     num_states = len(list(set(df['state'])))
     
@@ -239,7 +242,7 @@ def _plot_state_deaths(df):
     plt.tight_layout()
     
 
-def _plot_county_cases(df):
+def _plot_county_cases(df: pd.DataFrame) -> None:
     
     num_counties = len(list(set(df['county'])))
     
@@ -259,7 +262,7 @@ def _plot_county_cases(df):
     plt.tight_layout()
     
 
-def _plot_county_deaths(df):
+def _plot_county_deaths(df: pd.DataFrame) -> None:
     
     num_counties = len(list(set(df['county'])))
     
@@ -279,21 +282,21 @@ def _plot_county_deaths(df):
     plt.tight_layout()
 
 
-def plot_new_cases(df):
+def plot_new_cases(df: pd.DataFrame) -> None:
     if "county, state" in df.columns:
         _plot_new_cases_county(df)
     else:
         _plot_new_cases_state(df)
         
         
-def plot_new_deaths(df):
+def plot_new_deaths(df: pd.DataFrame) -> None:
     if "county, state" in df.columns:
         _plot_new_deaths_county(df)
     else:
         _plot_new_deaths_state(df)
         
     
-def _plot_new_cases_state(df):
+def _plot_new_cases_state(df: pd.DataFrame) -> None:
     num_states = len(list(set(df['state'])))
     
     if num_states > 27:
@@ -312,7 +315,7 @@ def _plot_new_cases_state(df):
     plt.tight_layout()
     
     
-def _plot_new_cases_county(df):
+def _plot_new_cases_county(df: pd.DataFrame) -> None:
     num_counties = len(list(set(df['county'])))
     
     if num_counties > 27:
@@ -331,7 +334,7 @@ def _plot_new_cases_county(df):
     plt.tight_layout()
     
 
-def _plot_new_deaths_state(df):
+def _plot_new_deaths_state(df: pd.DataFrame) -> None:
     num_states = len(list(set(df['state'])))
     
     if num_states > 27:
@@ -350,7 +353,7 @@ def _plot_new_deaths_state(df):
     plt.tight_layout()
     
     
-def _plot_new_deaths_county(df):
+def _plot_new_deaths_county(df: pd.DataFrame) -> None:
     num_counties = len(list(set(df['county'])))
     
     if num_counties > 27:
@@ -369,7 +372,7 @@ def _plot_new_deaths_county(df):
     plt.tight_layout()
 
 
-def plot_state_cases_vs_deaths(df):
+def plot_state_cases_vs_deaths(df: pd.DataFrame) -> None:
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'cases', data=df, color="b", legend=None)
     plt.ylabel('Cases')
@@ -389,7 +392,7 @@ def plot_state_cases_vs_deaths(df):
     plt.tight_layout()
     
     
-def _plot_state_moving_average(df):
+def _plot_state_moving_average(df: pd.DataFrame) -> None:
     
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'new_cases', data=df, color="b", legend=None)
@@ -408,7 +411,7 @@ def _plot_state_moving_average(df):
     plt.tight_layout()
     
     
-def _plot_county_moving_average(df):
+def _plot_county_moving_average(df: pd.DataFrame) -> None:
     
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'new_cases', data=df, color="b", legend=None)
