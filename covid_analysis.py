@@ -8,10 +8,13 @@ Created on Mon Mar 30 15:46:19 2020
 
 from typing import Iterable, List
 
+import colorcet as cc
+import imageio
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.figure_factory as ff
 import seaborn as sns
 
 
@@ -428,6 +431,55 @@ def _plot_county_moving_average(df: pd.DataFrame) -> None:
     plt.ylabel('Fitted')
     plt.xlabel('Date')
     plt.tight_layout()
+
+
+def make_wisconsin_county_plots() -> None:
+    
+    cd = load_county_data()    
+    wi = cd[cd['state'] == 'Wisconsin']
+    wi = get_data_since_date(wi, '2020-03-08')
+    
+    most_recent_date = max(wi['date'])
+    
+    winow = wi[wi['date'] == most_recent_date]
+    
+    multiplier = int(len(cc.fire)/len(winow))
+    palette = [cc.fire[i*multiplier] for i in range(len(winow))]
+    endpts = list(np.linspace(0, max(winow['cases']), len(palette) - 1))
+    
+    images = []
+    
+    for date in list(set(wi['date'])):
+        print(date)
+        plot_df = wi[wi['date'] == date]
+        
+        fig = ff.create_choropleth(
+            fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
+            scope=['WI'], # Define your scope
+            binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
+            county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
+            legend_title='Cases', title=f'Cases by County {date}'
+        )
+        
+        fig.update_layout(
+            autosize=False,
+            width=900,
+            height=500,
+            margin=dict(
+                pad=4
+            )
+        )
+        
+        fig.write_image(f'counties_{date}.png')
+        
+        images.append(f'counties_{date}.png')
+        
+    images = sorted(images)
+    
+    gif_images = [imageio.imread(x) for x in images]
+    
+    imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
+    
     
     
 
