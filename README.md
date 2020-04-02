@@ -1,6 +1,9 @@
 # Analyzing NYTimes Data With Python  
 In this forked repo from the New York Times, I've written a module in Python with helpful functions for quickly analyzing COVID-19 data.  
 
+Cases Per County in Wisconsin Since March 8, 2020  
+![Case Counts per County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin.gif)  
+
 Case Counts for 5 Most-Affected States From March 1, 2020 to April 1, 2020
 ![Case Counts for 5 Most-Affected States From March 1, 2020 to April 1, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
 
