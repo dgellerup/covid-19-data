@@ -6,6 +6,7 @@ Created on Mon Mar 30 15:46:19 2020
 @author: dgelleru
 """
 
+import os
 from typing import Iterable, List
 
 import colorcet as cc
@@ -452,28 +453,31 @@ def make_wisconsin_county_plots() -> None:
     
     for date in list(set(wi['date'])):
         print(date)
-        plot_df = wi[wi['date'] == date]
         
-        fig = ff.create_choropleth(
-            fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
-            scope=['WI'], # Define your scope
-            binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
-            county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
-            legend_title='Cases', title=f'Cases by County {date}'
-        )
+        if f'plots/wisconsin/counties_{date}.png' not in os.listdir('plots/wisconsin'):
         
-        fig.update_layout(
-            autosize=False,
-            width=900,
-            height=500,
-            margin=dict(
-                pad=4
+            plot_df = wi[wi['date'] == date]
+            
+            fig = ff.create_choropleth(
+                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
+                scope=['WI'], # Define your scope
+                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
+                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
+                legend_title='Cases', title=f'Cases by County {date}'
             )
-        )
+            
+            fig.update_layout(
+                autosize=False,
+                width=900,
+                height=500,
+                margin=dict(
+                    pad=4
+                )
+            )
+            
+            fig.write_image(f'plots/wisconsin/counties_{date}.png')
         
-        fig.write_image(f'counties_{date}.png')
-        
-        images.append(f'counties_{date}.png')
+        images.append(f'plots/wisconsin/counties_{date}.png')
         
     images = sorted(images)
     
@@ -481,6 +485,110 @@ def make_wisconsin_county_plots() -> None:
     
     imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
     
+    
+def make_michigan_county_plots() -> None:
+    
+    cd = load_county_data()    
+    mi = cd[cd['state'] == 'Michigan']
+    mi.dropna(inplace=True)
+    mi = get_data_since_date(mi, '2020-03-10')
+    
+    most_recent_date = max(mi['date'])
+    
+    minow = mi[mi['date'] == most_recent_date]
+    
+    multiplier = int(len(cc.fire)/len(minow))
+    palette = [cc.fire[i*multiplier] for i in range(len(minow))]
+    endpts = list(np.linspace(0, max(minow['cases']), len(palette) - 1))
+    endpts = [int(x) for x in endpts]
+    
+    images = []
+    
+    for date in list(set(mi['date'])):
+        print(date)
+        
+        if f'plots/michigan/counties_{date}.png' not in os.listdir('plots/michigan'):
+            
+            plot_df = mi[mi['date'] == date]
+            
+            fig = ff.create_choropleth(
+                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
+                scope=['MI'], # Define your scope
+                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
+                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
+                legend_title='Cases', title=f'Cases by County {date}'
+            )
+            
+            fig.update_layout(
+                autosize=False,
+                width=900,
+                height=500,
+                margin=dict(
+                    pad=4
+                )
+            )
+            
+            fig.write_image(f'plots/michigan/counties_{date}.png')
+        
+        images.append(f'plots/michigan/counties_{date}.png')
+        
+    images = sorted(images)
+    
+    gif_images = [imageio.imread(x) for x in images]
+    
+    imageio.mimsave('plots/michigan.gif', gif_images, duration=0.5)
+    
+    
+def make_washington_county_plots() -> None:
+    
+    cd = load_county_data()    
+    wi = cd[cd['state'] == 'Washington']
+    wi.dropna(inplace=True)
+    wi = get_data_since_date(wi, '2020-02-23')
+    
+    most_recent_date = max(wi['date'])
+    
+    winow = wi[wi['date'] == most_recent_date]
+    
+    multiplier = int(len(cc.fire)/len(winow))
+    palette = [cc.fire[i*multiplier] for i in range(len(winow))]
+    endpts = list(np.linspace(0, max(winow['cases']), len(palette) - 1))
+    endpts = [int(x) for x in endpts]
+    
+    images = []
+    
+    for date in list(set(wi['date'])):
+        print(date)
+        if f'plots/washington/counties_{date}.png' not in os.listdir('plots/washington'):
+            
+            plot_df = wi[wi['date'] == date]
+            
+            fig = ff.create_choropleth(
+                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
+                scope=['WA'], # Define your scope
+                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
+                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
+                legend_title='Cases', title=f'Cases by County {date}'
+            )
+            
+            fig.update_layout(
+                autosize=False,
+                width=900,
+                height=500,
+                margin=dict(
+                    pad=4
+                )
+            )
+            
+            fig.write_image(f'plots/washington/counties_{date}.png')
+        
+        images.append(f'plots/washington/counties_{date}.png')
+        
+    images = sorted(images)
+    
+    gif_images = [imageio.imread(x) for x in images]
+    
+    imageio.mimsave('plots/washington.gif', gif_images, duration=0.5)
     
     
 
