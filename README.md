@@ -4,8 +4,8 @@ In this forked repo from the New York Times, I've written a module in Python wit
 Cases Per County in Wisconsin Since March 8, 2020  
 ![Case Counts per County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin.gif)  
 
-Case Counts for 5 Most-Affected States From March 1, 2020 to April 2, 2020
-![Case Counts for 5 Most-Affected States From March 1, 2020 to April 2, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
+Case Counts for 5 Most-Affected States From March 1, 2020 to April 5, 2020
+![Case Counts for 5 Most-Affected States From March 1, 2020 to April 5, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
 
 # Coronavirus (Covid-19) Data in the United States
 
