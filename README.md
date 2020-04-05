@@ -95,15 +95,15 @@ Four counties (Cass, Clay, Jackson and Platte) overlap the municipality of Kansa
 
 * Alameda, Calif.
 
-<<<<<<< HEAD
-Joplin is reported separately from Jasper and Newton Counties.
-=======
 Counts for Alameda County include cases and deaths from Berkeley and the Grand Princess cruise ship.
->>>>>>> fab65f0aff1fd06ab3baba30855526f0e41bf20b
 
 * Chicago
 
 All cases and deaths for Chicago are reported as part of Cook County.
+
+* Guam
+
+Counts for Guam include cases reported from the USS Theodore Roosevelt.
 
 
 ## License and Attribution
