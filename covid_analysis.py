@@ -6,6 +6,7 @@ Created on Mon Mar 30 15:46:19 2020
 @author: dgelleru
 """
 
+import json
 import os
 from typing import Iterable, List
 
@@ -17,6 +18,13 @@ import numpy as np
 import pandas as pd
 import plotly.figure_factory as ff
 import seaborn as sns
+
+
+def get_census_api_key():
+    keyfile_dir = json.load(open('api_keypath.json')).get('api_keypath')
+    path_to_keyfile = os.path.join(keyfile_dir, 'keys.json')
+        
+    return json.load(open(path_to_keyfile)).get('us_census')
 
 
 def load_state_data() -> pd.DataFrame:
@@ -454,7 +462,7 @@ def make_wisconsin_county_plots() -> None:
     for date in list(set(wi['date'])):
         print(date)
         
-        if f'plots/wisconsin/counties_{date}.png' not in os.listdir('plots/wisconsin'):
+        if f'counties_{date}.png' not in os.listdir('plots/wisconsin'):
         
             plot_df = wi[wi['date'] == date]
             
@@ -507,7 +515,7 @@ def make_michigan_county_plots() -> None:
     for date in list(set(mi['date'])):
         print(date)
         
-        if f'plots/michigan/counties_{date}.png' not in os.listdir('plots/michigan'):
+        if f'counties_{date}.png' not in os.listdir('plots/michigan'):
             
             plot_df = mi[mi['date'] == date]
             
@@ -559,7 +567,7 @@ def make_washington_county_plots() -> None:
     
     for date in list(set(wi['date'])):
         print(date)
-        if f'plots/washington/counties_{date}.png' not in os.listdir('plots/washington'):
+        if f'counties_{date}.png' not in os.listdir('plots/washington'):
             
             plot_df = wi[wi['date'] == date]
             
