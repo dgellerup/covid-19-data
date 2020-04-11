@@ -11,13 +11,17 @@ import os
 from typing import Iterable, List
 
 import colorcet as cc
+import geopandas as gpd
 import imageio
+import matplotlib
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.figure_factory as ff
+import requests
 import seaborn as sns
+import us
+from zipfile import ZipFile
 
 
 def get_census_api_key():
@@ -83,6 +87,10 @@ def load_county_data() -> pd.DataFrame:
     county_data['new_deaths'] = new_deaths
     
     county_data.sort_index(inplace=True)
+    
+    county_data.dropna(inplace=True)
+    
+    county_data['fips'] = county_data['fips'].astype(int)
     
     return county_data
 
@@ -440,52 +448,212 @@ def _plot_county_moving_average(df: pd.DataFrame) -> None:
     plt.ylabel('Fitted')
     plt.xlabel('Date')
     plt.tight_layout()
-
-
-def make_wisconsin_county_plots() -> None:
+        
     
-    cd = load_county_data()    
-    wi = cd[cd['state'] == 'Wisconsin']
-    wi = get_data_since_date(wi, '2020-03-08')
+def make_state_counties_gif(state: str, date: str='default') -> None:
     
-    most_recent_date = max(wi['date'])
+    county_data = load_county_data()
+    state_df = county_data[county_data['state'] == us.states.lookup(state).name]
     
-    winow = wi[wi['date'] == most_recent_date]
+    if date == 'default':
+        state_df = get_data_since_date(state_df, get_date_of_first_case(state_df, state))
+    else:
+        state_df = get_data_since_date(state_df, date)
+        
+    vmin, vmax = 0, state_df['cases'].max()
     
-    multiplier = int(len(cc.fire)/len(winow))
-    palette = [cc.fire[i*multiplier] for i in range(len(winow))]
-    endpts = list(np.linspace(0, max(winow['cases']), len(palette) - 1))
-    endpts = [int(x) for x in endpts]
+    shapefile_url = us.states.lookup(state).shapefile_urls().get('county')
+    
+    r = requests.get(shapefile_url)
+    
+    basepath = os.path.join(os.getcwd(), f'resources/shapefiles/{state}')
+    plotpath = os.path.join(os.getcwd(), f'plots/{us.states.lookup(state).name}')
+    
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+        
+    if not os.path.exists(plotpath):
+        os.makedirs(plotpath)
+    
+    with open(os.path.join(basepath, 'shp.zip'), 'wb') as f:
+        f.write(r.content)
+    
+    # Create a ZipFile Object and load sample.zip in it
+    with ZipFile(os.path.join(basepath, 'shp.zip'), 'r') as zipObj:
+       # Extract all the contents of zip file in current directory
+       zipObj.extractall(basepath)
+    
+    """map_df = gpd.read_file('zip://resources/shapefiles/c_02ap19.zip')
+    
+    map_df = map_df[map_df['STATE'] == us.states.lookup(state).abbr]"""
+    
+    shapefile = list(filter(lambda x: x.endswith('.shp'), os.listdir(basepath)))[0]
+    
+    shapefile_path = os.path.join(basepath, shapefile)
+    
+    map_df = gpd.read_file(shapefile_path)
+    #map_df['COUNTY_FIP'] = map_df['COUNTY_FIP'].astype(int)
     
     images = []
     
-    for date in list(set(wi['date'])):
-        print(date)
+    for date in list(set(state_df['date'])):
         
-        if f'counties_{date}.png' not in os.listdir('plots/wisconsin'):
+        state_from_date = state_df[state_df['date'] == date]
         
-            plot_df = wi[wi['date'] == date]
-            
-            fig = ff.create_choropleth(
-                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
-                scope=['WI'], # Define your scope
-                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
-                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
-                legend_title='Cases', title=f'Cases by County {date}'
-            )
-            
-            fig.update_layout(
-                autosize=False,
-                width=900,
-                height=500,
-                margin=dict(
-                    pad=4
-                )
-            )
-            
-            fig.write_image(f'plots/wisconsin/counties_{date}.png')
+        state_from_date['fips'] = state_from_date['fips'].astype(str)
+
+        merged = map_df.set_index("GEOID10").join(state_from_date.set_index('fips'))
         
-        images.append(f'plots/wisconsin/counties_{date}.png')
+        variable = 'cases'
+        
+        fig, ax = plt.subplots(1, figsize=(12, 9))
+        
+        merged.plot(column=variable,
+                    cmap='viridis',
+                    linewidth=0.8,
+                    ax=ax,
+                    edgecolor='0.8',
+                    vmin=vmin,
+                    vmax=vmax,
+                    missing_kwds={"color": "lightgrey"})
+        
+        ax.axis('off')
+        
+        # add a title
+        ax.set_title(f"Cases by County {date}",
+                     fontdict={'fontsize': '18', 'fontweight' : '3'})
+        
+        # create an annotation for the data source
+        ax.annotate('Source: The New York Times, 2020',
+                    xy=(0.1, 0.08),
+                    xycoords='figure fraction',
+                    horizontalalignment='left', 
+                    verticalalignment='top',
+                    fontsize=12,
+                    color='#555555')
+        
+        # Create colorbar as a legend
+        sm = plt.cm.ScalarMappable(cmap='viridis', norm=plt.Normalize(vmin=vmin, vmax=vmax))
+        
+        # empty array for the data range
+        sm._A = []
+        
+        # add the colorbar to the figure
+        cbar = fig.colorbar(sm)
+        
+        #plt.axis('equal')
+        
+        fig.savefig(os.path.join(plotpath, f'counties_{date}.png'), dpi=300)
+        
+        plt.close(fig)
+        
+        images.append(os.path.join(plotpath, f'counties_{date}.png'))
+        
+    images = sorted(images)
+    
+    gif_images = [imageio.imread(x) for x in images]
+    
+    imageio.mimsave(f'plots/{state}.gif', gif_images, duration=0.5)
+    
+    
+def make_nice_wi_gif():
+    
+    state_data = load_state_data()
+    state_data = state_data[state_data['state'] == 'Wisconsin']
+    wi_state = get_data_since_date(state_data, '2020-03-01')
+    
+    county_data = load_county_data()
+    state_df = county_data[county_data['state'] == 'Wisconsin']
+            
+    state_df['short_fips'] = state_df['fips'].apply(lambda x: int(str(int(x))[2:]))
+    
+    state_df = get_data_since_date(state_df, '2020-03-01')
+    
+    vmin, vmax = 0, state_df['cases'].max()
+        
+    basepath = os.path.join(os.getcwd(), 'resources/shapefiles/Wisconsin')
+    plotpath = os.path.join(os.getcwd(), 'plots/wisconsin')
+    
+    if not os.path.exists(basepath):
+        os.makedirs(basepath)
+        
+    if not os.path.exists(plotpath):
+        os.makedirs(plotpath)
+        
+    shapefile = list(filter(lambda x: x.endswith('.shp'), os.listdir(basepath)))[0]
+    
+    shapefile_path = os.path.join(basepath, shapefile)
+    
+    map_df = gpd.read_file(shapefile_path)
+    map_df['COUNTY_FIP'] = map_df['COUNTY_FIP'].astype(int)
+        
+    images = []
+    
+    for date in list(set(state_df['date'])):
+        
+        wi_state['era'] = wi_state['date'].apply(lambda x: 'old' if x <= date else 'new')
+        
+        winow = state_df[state_df['date'] == date]
+
+        merged = map_df.set_index("COUNTY_FIP").join(winow.set_index('short_fips'))
+        
+        #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
+        
+        variable = 'cases'
+        
+        fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
+        
+        ax0.set_aspect('equal')
+        
+        merged.plot(column=variable,
+                    cmap='viridis',
+                    linewidth=0.8,
+                    ax=ax0,
+                    edgecolor='0.8',
+                    vmin=vmin,
+                    vmax=vmax,
+                    missing_kwds={"color": "lightgrey"},
+                    figsize=(6, 2))
+        
+        ax0.axis('off')
+        
+        # add a title
+        ax0.set_title(f"Cases by County {date}",
+                     fontdict={'fontsize': '18', 'fontweight' : '3'})
+        
+        # create an annotation for the data source
+        ax0.annotate('Source: The New York Times, 2020',
+                    xy=(0.1, 0.08),
+                    xycoords='figure fraction',
+                    horizontalalignment='left', 
+                    verticalalignment='top',
+                    fontsize=12,
+                    color='#555555')
+        
+        # Create colorbar as a legend
+        sm = plt.cm.ScalarMappable(cmap='viridis', norm=plt.Normalize(vmin=vmin, vmax=vmax))
+        
+        # empty array for the data range
+        sm._A = []
+        
+        # add the colorbar to the figure
+        cbar = fig.colorbar(sm, ax=ax0)
+        
+        sns.lineplot('date', 'cases', data=wi_state, ax=ax1, color='coral')
+        plt.fill_between(wi_state.date.values, wi_state.cases.values, color='coral')
+        plt.axvline(date)
+        ax1.spines['top'].set_visible(False)
+        ax1.spines['right'].set_visible(False)
+        ax1.spines['bottom'].set_visible(False)
+        ax1.spines['left'].set_visible(False)
+        ax1.axes.get_xaxis().set_visible(False)
+        ax1.set_ylabel('State Cases')
+        
+        fig.savefig(os.path.join(plotpath, f'counties_{date}.png'), dpi=300)
+        
+        plt.close(fig)
+        
+        images.append(os.path.join(plotpath, f'counties_{date}.png'))
         
     images = sorted(images)
     
@@ -494,112 +662,14 @@ def make_wisconsin_county_plots() -> None:
     imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
     
     
-def make_michigan_county_plots() -> None:
-    
-    cd = load_county_data()    
-    mi = cd[cd['state'] == 'Michigan']
-    mi.dropna(inplace=True)
-    mi = get_data_since_date(mi, '2020-03-10')
-    
-    most_recent_date = max(mi['date'])
-    
-    minow = mi[mi['date'] == most_recent_date]
-    
-    multiplier = int(len(cc.fire)/len(minow))
-    palette = [cc.fire[i*multiplier] for i in range(len(minow))]
-    endpts = list(np.linspace(0, max(minow['cases']), len(palette) - 1))
-    endpts = [int(x) for x in endpts]
-    
-    images = []
-    
-    for date in list(set(mi['date'])):
-        print(date)
-        
-        if f'counties_{date}.png' not in os.listdir('plots/michigan'):
-            
-            plot_df = mi[mi['date'] == date]
-            
-            fig = ff.create_choropleth(
-                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
-                scope=['MI'], # Define your scope
-                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
-                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
-                legend_title='Cases', title=f'Cases by County {date}'
-            )
-            
-            fig.update_layout(
-                autosize=False,
-                width=900,
-                height=500,
-                margin=dict(
-                    pad=4
-                )
-            )
-            
-            fig.write_image(f'plots/michigan/counties_{date}.png')
-        
-        images.append(f'plots/michigan/counties_{date}.png')
-        
-    images = sorted(images)
-    
-    gif_images = [imageio.imread(x) for x in images]
-    
-    imageio.mimsave('plots/michigan.gif', gif_images, duration=0.5)
     
     
-def make_washington_county_plots() -> None:
-    
-    cd = load_county_data()    
-    wi = cd[cd['state'] == 'Washington']
-    wi.dropna(inplace=True)
-    wi = get_data_since_date(wi, '2020-02-23')
-    
-    most_recent_date = max(wi['date'])
-    
-    winow = wi[wi['date'] == most_recent_date]
-    
-    multiplier = int(len(cc.fire)/len(winow))
-    palette = [cc.fire[i*multiplier] for i in range(len(winow))]
-    endpts = list(np.linspace(0, max(winow['cases']), len(palette) - 1))
-    endpts = [int(x) for x in endpts]
-    
-    images = []
-    
-    for date in list(set(wi['date'])):
-        print(date)
-        if f'counties_{date}.png' not in os.listdir('plots/washington'):
-            
-            plot_df = wi[wi['date'] == date]
-            
-            fig = ff.create_choropleth(
-                fips=plot_df['fips'], values=plot_df['cases'], colorscale=palette, show_state_data=True, 
-                scope=['WA'], # Define your scope
-                binning_endpoints=endpts, # If your values is a list of numbers, you can bin your values into half-open intervals
-                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5}, 
-                legend_title='Cases', title=f'Cases by County {date}'
-            )
-            
-            fig.update_layout(
-                autosize=False,
-                width=900,
-                height=500,
-                margin=dict(
-                    pad=4
-                )
-            )
-            
-            fig.write_image(f'plots/washington/counties_{date}.png')
-        
-        images.append(f'plots/washington/counties_{date}.png')
-        
-    images = sorted(images)
-    
-    gif_images = [imageio.imread(x) for x in images]
-    
-    imageio.mimsave('plots/washington.gif', gif_images, duration=0.5)
     
     
-
+    
+    
+    
+    
     
     
     
