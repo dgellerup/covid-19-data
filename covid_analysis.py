@@ -18,11 +18,18 @@ import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from plotly.figure_factory import _county_choropleth as pleth
 import requests
 import seaborn as sns
 import us
 from zipfile import ZipFile
 
+st_to_state_name_dict = pleth.st_to_state_name_dict
+state_to_st_dict = pleth.state_to_st_dict
+
+us_bounds = pleth._create_us_counties_df(st_to_state_name_dict, state_to_st_dict)
+us_county_bounds = us_bounds[0]
+us_state_bounds = us_bounds[1]
 
 def get_census_api_key():
     keyfile_dir = json.load(open('api_keypath.json')).get('api_keypath')
@@ -93,6 +100,32 @@ def load_county_data() -> pd.DataFrame:
     county_data['fips'] = county_data['fips'].astype(int)
     
     return county_data
+
+
+def select_states(df: pd.DataFrame, states: str or List[str]) -> pd.DataFrame:
+    """
+    Accepts a Pandas DataFrame and a string or list of strings containing state names.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame containing state data.
+    states : str or List[str]
+        Names of states to select.
+
+    Returns
+    -------
+    states_df : TYPE
+        Pandas DataFrame only containing data for the selected states.
+
+    """
+    
+    if type(states) == str:
+        states = [states]
+        
+    states_df = df[df['state'].isin(states)]
+    
+    return states_df
 
 
 def states_with_most_cases(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
@@ -166,21 +199,73 @@ def get_data_since_date(df: pd.DataFrame, date: str) -> pd.DataFrame:
     return data_after_date
 
 
-def five_day_moving_average(iterable: Iterable) -> List[float]:
-    casted = list(iterable)
+def five_day_moving_average(df: pd.DataFrame) -> List[float]:
+    """
+    Creates new column 'moving_ave' and populates it with the five day moving
+    average of new cases.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame containing state data.
+
+    Returns
+    -------
+    List[float]
+        Pandas DataFrame with 'moving_ave' column/data added.
+
+    """
     
-    moving_ave = []
-    for i in range(len(casted)):
-        if 1 > i > (len(casted) - 2):
-            moving_ave.append(None)
-        else:
-            before_after = casted[i-2:i]
-            before_after.extend(casted[i:i+3])
-            moving_ave.append(pd.Series(before_after).mean())
-    return moving_ave
+    columns = list(df.columns)
+    columns.append('moving_ave')
+    
+    master_df = pd.DataFrame(columns=list(df.columns).append('moving_ave'))
+    
+    for state in list(set(df['state'])):
+        state_df = df[df['state'] == state]
+        
+        iterable = state_df['new_cases']
+        
+        casted = list(iterable)
+        
+        moving_ave = []
+        
+        for i in range(len(casted)):
+            if i > (len(casted) - 3):
+                moving_ave.append(None)
+            else:
+                before_after = casted[i-2:i]
+                before_after.extend(casted[i:i+3])
+                moving_ave.append(pd.Series(before_after).mean())
+                
+        state_df['moving_ave'] = moving_ave
+    
+        master_df = master_df.append(state_df)
+    
+    master_df.sort_index()
+    
+    return master_df
     
     
-def nine_day_moving_average(iterable: Iterable) -> List[float]:
+def nine_day_moving_average(df: pd.DataFrame) -> List[float]:
+    """
+    Creates new column 'moving_ave' and populates it with the nine day moving
+    average of new cases.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame containing state data.
+
+    Returns
+    -------
+    List[float]
+        Pandas DataFrame with 'moving_ave' column/data added.
+
+    """
+    
+    iterable = df['new_cases']
+    
     casted = list(iterable)
     
     moving_ave = []
@@ -191,6 +276,9 @@ def nine_day_moving_average(iterable: Iterable) -> List[float]:
             before_after = casted[i-4:i]
             before_after.extend(casted[i:i+5])
             moving_ave.append(pd.Series(before_after).mean())
+            
+    df['moving_ave'] = moving_ave
+    
     return moving_ave
 
 
@@ -315,7 +403,7 @@ def plot_new_deaths(df: pd.DataFrame) -> None:
     else:
         _plot_new_deaths_state(df)
         
-    
+            
 def _plot_new_cases_state(df: pd.DataFrame) -> None:
     num_states = len(list(set(df['state'])))
     
@@ -410,23 +498,23 @@ def plot_state_cases_vs_deaths(df: pd.DataFrame) -> None:
     plt.ylabel('Deaths')
     plt.xlabel('Date')
     plt.tight_layout()
-    
-    
+
+
+def plot_moving_average(df: pd.DataFrame) -> None:
+    if "county, state" in df.columns:
+        _plot_county_moving_average(df)
+    else:
+        _plot_state_moving_average(df)
+        
+        
 def _plot_state_moving_average(df: pd.DataFrame) -> None:
-    
+            
     plt.figure(figsize=(12, 6))
-    sns.lineplot('date', 'new_cases', data=df, color="b", legend=None)
+    sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
     plt.ylabel('Cases')
     plt.xticks(rotation=90)
     
-    sns.lineplot('date', 'moving_ave', data=df, color="r", legend=None)
     
-    
-    blue_line = mlines.Line2D([], [], color='blue', marker=None, label='New Cases')
-    red_line = mlines.Line2D([], [], color='red', marker=None, label="Fitted")
-    plt.legend(loc='upper left', handles=[blue_line, red_line])
-    
-    plt.ylabel('Fitted')
     plt.xlabel('Date')
     plt.tight_layout()
     
@@ -496,9 +584,9 @@ def make_state_counties_gif(state: str, date: str='default') -> None:
     
     images = []
     
-    for date in list(set(state_df['date'])):
+    for plot_date in list(set(state_df['date'])):
         
-        state_from_date = state_df[state_df['date'] == date]
+        state_from_date = state_df[state_df['date'] == plot_date]
         
         state_from_date['fips'] = state_from_date['fips'].astype(str)
 
@@ -520,7 +608,7 @@ def make_state_counties_gif(state: str, date: str='default') -> None:
         ax.axis('off')
         
         # add a title
-        ax.set_title(f"Cases by County {date}",
+        ax.set_title(f"Cases by County {plot_date}",
                      fontdict={'fontsize': '18', 'fontweight' : '3'})
         
         # create an annotation for the data source
@@ -543,11 +631,11 @@ def make_state_counties_gif(state: str, date: str='default') -> None:
         
         #plt.axis('equal')
         
-        fig.savefig(os.path.join(plotpath, f'counties_{date}.png'), dpi=300)
+        fig.savefig(os.path.join(plotpath, f'counties_{plot_date}.png'), dpi=300)
         
         plt.close(fig)
         
-        images.append(os.path.join(plotpath, f'counties_{date}.png'))
+        images.append(os.path.join(plotpath, f'counties_{plot_date}.png'))
         
     images = sorted(images)
     
@@ -560,14 +648,14 @@ def make_nice_wi_gif():
     
     state_data = load_state_data()
     state_data = state_data[state_data['state'] == 'Wisconsin']
-    wi_state = get_data_since_date(state_data, '2020-03-01')
+    wi_state = get_data_since_date(state_data, '2020-03-08')
     
     county_data = load_county_data()
     state_df = county_data[county_data['state'] == 'Wisconsin']
             
     state_df['short_fips'] = state_df['fips'].apply(lambda x: int(str(int(x))[2:]))
     
-    state_df = get_data_since_date(state_df, '2020-03-01')
+    state_df = get_data_since_date(state_df, '2020-03-08')
     
     vmin, vmax = 0, state_df['cases'].max()
         
