@@ -4,8 +4,8 @@ In this forked repo from the New York Times, I've written a module in Python wit
 Cases Per County in Wisconsin Since March 8, 2020  
 ![Case Counts per County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin.gif)  
 
-Case Counts for 5 Most-Affected States From March 1, 2020 to April 13, 2020
-![Case Counts for 5 Most-Affected States From March 1, 2020 to April 13, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
+Case Counts for 5 Most-Affected States From March 1, 2020 to April 14, 2020
+![Case Counts for 5 Most-Affected States From March 1, 2020 to April 14, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/plot.png)
 
 # Coronavirus (Covid-19) Data in the United States
 
@@ -22,7 +22,7 @@ The data begins with the first reported coronavirus case in Washington State on 
 ## United States Data
 
 Data on cumulative coronavirus cases and deaths can be found in three files, one for each of these geographic levels: U.S., states and counties.
- 
+
 Each row of data reports cumulative counts based on our best reporting up to the moment we publish an update. We do our best to revise earlier entries in the data when we receive new information. If a county is not listed for a date, then there were zero reported confirmed cases and deaths.
 
 State and county files contain [FIPS codes](https://www.census.gov/quickfacts/fact/note/US/fips), a standard geographic identifier, to make it easier for an analyst to combine this data with other data sets like a map file or population data.
