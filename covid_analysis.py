@@ -66,6 +66,13 @@ def load_national_data() -> pd.DataFrame:
     national_data['new_cases'] = new_cases
     national_data['new_deaths'] = new_deaths
     
+    national_population = population_data[population_data['COUNTY'] == 0]
+    national_population = national_population['POPESTIMATE2019'].sum()
+    
+    national_data['population'] = national_population
+    national_data['cases_per_100k'] = national_data['cases'] / (national_data['population']/100000)
+    national_data['deaths_per_100k'] = national_data['deaths'] / (national_data['population']/100000)
+    
     return national_data
 
     
@@ -229,6 +236,61 @@ def counties_with_most_deaths(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
     
     most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
     most_recent_df.sort_values('deaths', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_counties_full_data = df[df['county, state'].isin(most_affected['county, state'])]
+    
+    return most_affected_counties_full_data
+
+
+def states_highest_per_capita_cases(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    if 'county' in df.columns:
+        most_recent_df.sort_values('cases_per_10k', ascending=False, inplace=True)
+    else:
+        most_recent_df.sort_values('cases_per_100k', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_states_full_data = df[df['state'].isin(most_affected['state'])]
+    
+    return most_affected_states_full_data
+
+
+def states_highest_per_capita_deaths(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    most_recent_df.sort_values('deaths_per_100k', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_states_full_data = df[df['state'].isin(most_affected['state'])]
+    
+    return most_affected_states_full_data
+
+
+def counties_highest_per_capita_cases(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    most_recent_df.sort_values('cases_per_10k', ascending=False, inplace=True)
+    most_recent_df.reset_index(drop=True, inplace=True)
+    
+    most_affected = pd.DataFrame(most_recent_df.iloc[:number])
+    most_affected_counties_full_data = df[df['county, state'].isin(most_affected['county, state'])]
+    
+    return most_affected_counties_full_data
+
+
+def counties_highest_per_capita_deaths(df: pd.DataFrame, number: int=5) -> pd.DataFrame:
+    most_recent_date = df['date'].max()
+    
+    most_recent_df = pd.DataFrame(df[df['date'] == most_recent_date])
+    most_recent_df.sort_values('deaths_per_10k', ascending=False, inplace=True)
     most_recent_df.reset_index(drop=True, inplace=True)
     
     most_affected = pd.DataFrame(most_recent_df.iloc[:number])
@@ -556,7 +618,7 @@ def plot_deaths(df: pd.DataFrame) -> None:
         _plot_national_deaths(df)
     else:
         _plot_state_deaths(df)
-
+        
 
 def _plot_national_cases(df: pd.DataFrame) -> None:
     
@@ -663,6 +725,134 @@ def _plot_county_deaths(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=6, rotation=90)
     plt.title('County Deaths')
+    plt.ylabel('Deaths')
+    plt.xlabel('Date')
+    plt.tight_layout()
+        
+
+def plot_per_capita_cases(df: pd.DataFrame) -> None:
+    if "county, state" in df.columns:
+        _plot_cases_per_capita_county(df)
+    elif "state" not in df.columns:
+        _plot_cases_per_capita_national(df)
+    else:
+        _plot_cases_per_capita_state(df)
+    
+    
+def plot_per_capita_deaths(df: pd.DataFrame) -> None:
+    if "county, state" in df.columns:
+        _plot_deaths_per_capita_county(df)
+    elif "state" not in df.columns:
+        _plot_deaths_per_capita_national(df)
+    else:
+        _plot_deaths_per_capita_state(df)
+        
+        
+def _plot_cases_per_capita_national(df: pd.DataFrame) -> None:
+    
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'cases_per_100k', data=df)
+    
+    plt.xticks(size=6, rotation=90)
+    plt.title('National Cases per 100k People')
+    plt.ylabel('Cases')
+    plt.xlabel('Date')
+    plt.tight_layout()
+
+
+def _plot_deaths_per_capita_national(df: pd.DataFrame) -> None:
+    
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'deaths_per_100k', data=df)
+    
+    plt.xticks(size=6, rotation=90)
+    plt.title("National Deaths per 100K People")
+    plt.ylabel('Deaths')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+
+def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
+    
+    num_states = len(list(set(df['state'])))
+    
+    if num_states > 27:
+        num_col = 2
+    else:
+        num_col = 1
+    
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'cases_per_100k', hue='state', data=df)
+    
+    plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    plt.xticks(size=6, rotation=90)
+    plt.title('State Cases per 100k People')
+    plt.ylabel('Cases')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+
+def _plot_deaths_per_capita_state(df: pd.DataFrame) -> None:
+    
+    num_states = len(list(set(df['state'])))
+    
+    if num_states > 27:
+        num_col = 2
+    else:
+        num_col = 1
+    
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'deaths_per_100k', hue='state', data=df)
+    
+    plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    plt.xticks(size=6, rotation=90)
+    plt.title('State Deaths per 100k People')
+    plt.ylabel('Deaths')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+
+def _plot_cases_per_capita_county(df: pd.DataFrame) -> None:
+    
+    num_counties = len(list(set(df['county'])))
+    
+    if num_counties > 27:
+        num_col = int(num_counties/27) + 1
+    else:
+        num_col = 1
+        
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'cases_per_10k', hue='county, state', data=df)
+    
+    plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    plt.xticks(size=6, rotation=90)
+    plt.title('County Cases per 10k People')
+    plt.ylabel('Cases')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+
+def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
+    
+    num_counties = len(list(set(df['county'])))
+    
+    if num_counties > 27:
+        num_col = int(num_counties/27) + 1
+    else:
+        num_col = 1
+    
+    plt.figure(figsize=(12, 6))
+    
+    sns.lineplot('date', 'deaths_per_10k', hue='county, state', data=df)
+    
+    plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    plt.xticks(size=6, rotation=90)
+    plt.title('County Deaths per 10k People')
     plt.ylabel('Deaths')
     plt.xlabel('Date')
     plt.tight_layout()
