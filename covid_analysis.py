@@ -226,6 +226,75 @@ def get_data_since_date(df: pd.DataFrame, date: str) -> pd.DataFrame:
     return data_after_date
 
 
+def three_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.DataFrame:
+    """
+    Creates new column 'moving_ave' and populates it with the five day moving
+    average of new cases.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Pandas DataFrame containing state data.
+
+    Returns
+    -------
+    List[float]
+        Pandas DataFrame with 'moving_ave' column/data added.
+
+    """
+    
+    columns = list(df.columns)
+    
+    if 'state' in columns:
+        columns.append('moving_ave')
+        
+        #master_df = pd.DataFrame(columns=columns)
+        master_list = []
+        for state in list(set(df['state'])):
+            state_df = df[df['state'] == state]
+            
+            iterable = state_df[metric]
+            
+            casted = list(iterable)
+            
+            moving_ave = []
+            
+            for i in range(len(casted)):
+                if i > (len(casted) - 2) or i < 1:
+                    moving_ave.append(None)
+                else:
+                    before_after = casted[i-1:i+2]
+                    moving_ave.append(pd.Series(before_after).mean())
+                    
+            state_df['moving_ave'] = moving_ave
+        
+            #master_df = master_df.append(state_df)
+            master_list.append(state_df)
+        
+        master_df = pd.concat(master_list)
+        
+        master_df.sort_index()
+        
+        return master_df
+    
+    else:
+        iterable = df[metric]
+        
+        casted = list(iterable)
+        
+        moving_ave = []
+        for i in range(len(casted)):
+            if i > (len(casted) - 2) or i < 1:
+                moving_ave.append(None)
+            else:
+                before_after = casted[i-1:i+2]
+                moving_ave.append(pd.Series(before_after).mean())
+            
+        df['moving_ave'] = moving_ave
+        
+        return df
+    
+    
 def five_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.DataFrame:
     """
     Creates new column 'moving_ave' and populates it with the five day moving
