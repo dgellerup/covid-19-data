@@ -31,6 +31,10 @@ us_bounds = pleth._create_us_counties_df(st_to_state_name_dict, state_to_st_dict
 us_county_bounds = us_bounds[0]
 us_state_bounds = us_bounds[1]
 
+population_data = pd.read_csv('resources/population.csv')
+population_data = population_data[['STATE', 'COUNTY', 'STNAME', 'CTYNAME', 'POPESTIMATE2019']]
+
+
 def get_census_api_key():
     keyfile_dir = json.load(open('api_keypath.json')).get('api_keypath')
     path_to_keyfile = os.path.join(keyfile_dir, 'keys.json')
@@ -91,8 +95,17 @@ def load_state_data() -> pd.DataFrame:
     state_data['new_deaths'] = new_deaths
     
     state_data.sort_index(inplace=True)
+    
+    state_population = population_data[population_data['COUNTY'] == 0]
+    state_population.drop(['STATE', 'COUNTY', 'CTYNAME'], axis=1, inplace=True)
+    state_population.rename(columns={'STNAME': 'state', 'POPESTIMATE2019': 'population'}, inplace=True)
+    
+    final_state_data = state_data.join(state_population.set_index('state'), on='state')
+    
+    final_state_data['cases_per_100k'] = final_state_data['cases'] / (final_state_data['population']/100000)
+    final_state_data['deaths_per_100k'] = final_state_data['deaths'] / (final_state_data['population']/100000)
         
-    return state_data
+    return final_state_data
 
 
 def load_county_data() -> pd.DataFrame:
@@ -124,9 +137,26 @@ def load_county_data() -> pd.DataFrame:
     
     county_data.dropna(inplace=True)
     
-    county_data['fips'] = county_data['fips'].astype(int)
+    county_data['fips'] = county_data['fips'].astype(int).astype(str).apply(lambda x: f'0{x}' if len(x) == 4 else x)
     
-    return county_data
+    county_population = population_data[population_data['COUNTY'] != 0]
+    
+    state_fips = population_data['STATE'].astype(str).apply(lambda x: f'0{x}' if len(x) < 2 else x)
+    county_fips = population_data['COUNTY'].astype(str).apply(lambda x: f'00{x}' if len(x) == 1 else (f'0{x}' if len(x) == 2 else x))
+    
+    county_population.drop(['STATE', 'COUNTY', 'STNAME', 'CTYNAME'], axis=1, inplace=True)
+    county_population.rename(columns={'POPESTIMATE2019': 'population'}, inplace=True)
+    
+    county_population['fips'] = state_fips + county_fips
+    
+    final_county_data = county_data.join(county_population.set_index('fips'), on='fips')
+    
+    final_county_data['cases_per_10k'] = final_county_data['cases'] / (final_county_data['population']/10000)
+    final_county_data['deaths_per_10k'] = final_county_data['deaths'] / (final_county_data['population']/10000)
+    
+    final_county_data['fips'] = final_county_data['fips'].astype(int)
+    
+    return final_county_data
 
 
 def select_states(df: pd.DataFrame, states: str or List[str]) -> pd.DataFrame:
