@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from plotly.figure_factory import _county_choropleth as pleth
+from pylab import fill
 import requests
 import seaborn as sns
 import us
@@ -72,6 +73,8 @@ def load_national_data() -> pd.DataFrame:
     national_data['population'] = national_population
     national_data['cases_per_100k'] = national_data['cases'] / (national_data['population']/100000)
     national_data['deaths_per_100k'] = national_data['deaths'] / (national_data['population']/100000)
+    
+    national_data['case_lethality'] = national_data['deaths'] / national_data['cases']
     
     return national_data
 
@@ -434,7 +437,7 @@ def five_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.Dat
         
         master_df = pd.concat(master_list)
         
-        master_df.sort_index()
+        master_df.sort_index(inplace=True)
         
         return master_df
     
@@ -756,7 +759,7 @@ def _plot_cases_per_capita_national(df: pd.DataFrame) -> None:
     
     plt.xticks(size=6, rotation=90)
     plt.title('National Cases per 100k People')
-    plt.ylabel('Cases')
+    plt.ylabel('Cases/100k')
     plt.xlabel('Date')
     plt.tight_layout()
 
@@ -769,7 +772,7 @@ def _plot_deaths_per_capita_national(df: pd.DataFrame) -> None:
     
     plt.xticks(size=6, rotation=90)
     plt.title("National Deaths per 100K People")
-    plt.ylabel('Deaths')
+    plt.ylabel('Deaths/100k')
     plt.xlabel('Date')
     plt.tight_layout()
     
@@ -790,7 +793,7 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=6, rotation=90)
     plt.title('State Cases per 100k People')
-    plt.ylabel('Cases')
+    plt.ylabel('Cases/100k')
     plt.xlabel('Date')
     plt.tight_layout()
     
@@ -811,7 +814,7 @@ def _plot_deaths_per_capita_state(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=6, rotation=90)
     plt.title('State Deaths per 100k People')
-    plt.ylabel('Deaths')
+    plt.ylabel('Deaths/100k')
     plt.xlabel('Date')
     plt.tight_layout()
     
@@ -832,7 +835,7 @@ def _plot_cases_per_capita_county(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=6, rotation=90)
     plt.title('County Cases per 10k People')
-    plt.ylabel('Cases')
+    plt.ylabel('Cases/10k')
     plt.xlabel('Date')
     plt.tight_layout()
     
@@ -853,7 +856,7 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=6, rotation=90)
     plt.title('County Deaths per 10k People')
-    plt.ylabel('Deaths')
+    plt.ylabel('Deaths/10k')
     plt.xlabel('Date')
     plt.tight_layout()
 
@@ -1056,6 +1059,42 @@ def _plot_county_moving_average(df: pd.DataFrame) -> None:
     plt.xticks(rotation=90)
     
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    plt.xlabel('Date')
+    plt.tight_layout()
+    
+
+def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
+    
+    if df == None:
+        state_data = load_state_data()
+        wi = select_states(state_data, 'Wisconsin')
+        winow = get_data_since_date(wi, '2020-03-08')
+        if ma_days not in [3, 5, 7, 9]:
+            df = five_day_moving_average(winow)
+        else:
+            if ma_days == 3:
+                df = three_day_moving_average(winow)
+            elif ma_days == 5:
+                df = five_day_moving_average(winow)
+            elif ma_days == 7:
+                df = seven_day_moving_average(winow)
+            elif ma_days == 9:
+                df = nine_day_moving_average(winow)
+                
+    plt.figure(figsize=(12, 6))
+    sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
+    plt.ylabel(f'New Cases - {ma_days} day moving average')
+    plt.xticks(rotation=90)
+    plt.axvline('2020-04-07', color='red', linestyle='--')
+    plt.text('2020-04-01', 100, 'Wisconsin Primary')
+    plt.plot(['2020-04-04', '2020-04-07'], [100, 80], 'black', linewidth=1)
+    max_date = df['date'].max()
+    split_date = max_date.split("-")
+    incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-21' else '2020-04-21'
+    fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
+    plt.text('2020-04-09', 100, 'Incubation Period')
+    
+    #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
     plt.tight_layout()
         
@@ -1271,6 +1310,7 @@ def make_nice_wi_gif():
     
     imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
     
+        
     
     
     
