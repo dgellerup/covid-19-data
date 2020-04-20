@@ -668,6 +668,7 @@ def _plot_state_cases(df: pd.DataFrame) -> None:
     plt.ylabel('Cases')
     plt.xlabel('Date')
     plt.tight_layout()
+    plt.savefig('plots/plot.png', dpi=300)
     
 
 def _plot_state_deaths(df: pd.DataFrame) -> None:
@@ -859,6 +860,7 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     plt.ylabel('Deaths/10k')
     plt.xlabel('Date')
     plt.tight_layout()
+    plt.savefig('plots/deadly_counties.png', dpi=300)
 
 
 def plot_new_cases(df: pd.DataFrame) -> None:
@@ -1097,6 +1099,7 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
     plt.tight_layout()
+    plt.savefig('plots/consequences.png', dpi=300)
         
     
 def make_state_counties_gif(state: str, date: str='default') -> None:
