@@ -2,7 +2,13 @@
 In this forked repo from the New York Times, I've written a module in Python with helpful functions for quickly analyzing COVID-19 data.  
 
 New cases in Wisconsin (5 Day Moving Average)
-![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png)  
+![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png)
+
+New cases in Brown County, WI (5 Day Moving Average)  
+![Brown County Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences_brown.png)  
+
+New cases in Kentucky (3 Day Moving Average)
+![Kentucky Protests](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences_ky.png) 
 
 Cases Per County in Wisconsin Since March 8, 2020  
 ![Case Counts per County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin.gif)  

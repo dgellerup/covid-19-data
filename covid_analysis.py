@@ -53,13 +53,17 @@ def load_national_data() -> pd.DataFrame:
         try:
             if national_data['cases'].iloc[i] >= national_data['cases'].iloc[i-1]:
                 cdiff = national_data['cases'].iloc[i] - national_data['cases'].iloc[i-1]
+            else:
+                cdiff = 0
+        except:
+            cdiff = 0
+        try:
+            if national_data['deaths'].iloc[i] >= national_data['deaths'].iloc[i-1]:
                 ddiff = national_data['deaths'].iloc[i] - national_data['deaths'].iloc[i-1]
             else:
-                cdiff = national_data['cases'].iloc[i]
-                ddiff = national_data['deaths'].iloc[i]
+                ddiff = 0
         except:
-            cdiff = national_data['cases'].iloc[i]
-            ddiff = national_data['deaths'].iloc[i]
+            ddiff = 0
         
         new_cases.append(cdiff)
         new_deaths.append(ddiff)
@@ -90,13 +94,17 @@ def load_state_data() -> pd.DataFrame:
         try:
             if state_data['cases'].iloc[i] >= state_data['cases'].iloc[i-1]:
                 cdiff = state_data['cases'].iloc[i] - state_data['cases'].iloc[i-1]
+            else:
+                cdiff = 0
+        except:
+            cdiff = 0
+        try:
+            if state_data['deaths'].iloc[i] >= state_data['deaths'].iloc[i-1]:
                 ddiff = state_data['deaths'].iloc[i] - state_data['deaths'].iloc[i-1]
             else:
-                cdiff = state_data['cases'].iloc[i]
-                ddiff = state_data['deaths'].iloc[i]
+                ddiff = 0
         except:
-            cdiff = state_data['cases'].iloc[i]
-            ddiff = state_data['deaths'].iloc[i]
+            ddiff = 0
             
         new_cases.append(cdiff)
         new_deaths.append(ddiff)
@@ -130,13 +138,17 @@ def load_county_data() -> pd.DataFrame:
         try:
             if county_data['cases'].iloc[i] >= county_data['cases'].iloc[i-1]:
                 cdiff = county_data['cases'].iloc[i] - county_data['cases'].iloc[i-1]
+            else:
+                cdiff = 0
+        except:
+            cdiff = 0
+        try:
+            if county_data['deaths'].iloc[i] >= county_data['deaths'].iloc[i-1]:
                 ddiff = county_data['deaths'].iloc[i] - county_data['deaths'].iloc[i-1]
             else:
-                cdiff = county_data['cases'].iloc[i]
-                ddiff = county_data['deaths'].iloc[i]
+                ddiff = 0
         except:
-            cdiff = county_data['cases'].iloc[i]
-            ddiff = county_data['deaths'].iloc[i]
+            ddiff = 0
         new_cases.append(cdiff)
         new_deaths.append(ddiff)
     
@@ -409,7 +421,37 @@ def five_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.Dat
     
     columns = list(df.columns)
     
-    if 'state' in columns:
+    if 'county' in columns:
+        columns.append('moving_ave')
+        
+        master_list = []
+        for county in list(set(df['county'])):
+            county_df = df[df['county'] == county]
+            
+            iterable = county_df[metric]
+            
+            casted = list(iterable)
+            
+            moving_ave = []
+            
+            for i in range(len(casted)):
+                if i > (len(casted) - 3) or i < 2:
+                    moving_ave.append(None)
+                else:
+                    before_after = casted[i-2:i+3]
+                    moving_ave.append(pd.Series(before_after).mean())
+            
+            county_df['moving_ave'] = moving_ave
+            
+            master_list.append(county_df)
+            
+        master_df = pd.concat(master_list)
+        
+        master_df.sort_index(inplace=True)
+        
+        return master_df
+            
+    elif 'state' in columns:
         columns.append('moving_ave')
         
         #master_df = pd.DataFrame(columns=columns)
@@ -859,6 +901,7 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     plt.title('County Deaths per 10k People')
     plt.ylabel('Deaths/10k')
     plt.xlabel('Date')
+    plt.legend(fontsize=8)
     plt.tight_layout()
     plt.savefig('plots/deadly_counties.png', dpi=300)
 
@@ -1067,22 +1110,24 @@ def _plot_county_moving_average(df: pd.DataFrame) -> None:
 
 def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     try:
-        print(len(df))
+        dummy = len(df)
     except:
         state_data = load_state_data()
         wi = select_states(state_data, 'Wisconsin')
-        winow = get_data_since_date(wi, '2020-03-08')
+        df = get_data_since_date(wi, '2020-03-08')
+        
+    if 'moving_ave' not in df.columns:
         if ma_days not in [3, 5, 7, 9]:
-            df = five_day_moving_average(winow)
+            df = five_day_moving_average(df)
         else:
             if ma_days == 3:
-                df = three_day_moving_average(winow)
+                df = three_day_moving_average(df)
             elif ma_days == 5:
-                df = five_day_moving_average(winow)
+                df = five_day_moving_average(df)
             elif ma_days == 7:
-                df = seven_day_moving_average(winow)
+                df = seven_day_moving_average(df)
             elif ma_days == 9:
-                df = nine_day_moving_average(winow)
+                df = nine_day_moving_average(df)
                 
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
@@ -1104,26 +1149,29 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     
 
 def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
-    
-    if type(df) == "NoneType":
+    try:
+        dummy = len(df)
+    except:
         county_data = load_county_data()
         wi = select_states(county_data, 'Wisconsin')
         winow = get_data_since_date(wi, '2020-03-08')
-        brown = winow[winow['county'] == "Brown"]
+        df = winow[winow['county'] == 'Brown']
+    
+    if 'moving_ave' not in df.columns:
         if ma_days not in [3, 5, 7, 9]:
-            df = five_day_moving_average(brown)
+            df = five_day_moving_average(df)
         else:
             if ma_days == 3:
-                df = three_day_moving_average(brown)
+                df = three_day_moving_average(df)
             elif ma_days == 5:
-                df = five_day_moving_average(brown)
+                df = five_day_moving_average(df)
             elif ma_days == 7:
-                df = seven_day_moving_average(brown)
+                df = seven_day_moving_average(df)
             elif ma_days == 9:
-                df = nine_day_moving_average(brown)
+                df = nine_day_moving_average(df)
                 
     plt.figure(figsize=(12, 6))
-    sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
+    sns.lineplot('date', 'moving_ave', hue='county', data=df)
     plt.ylabel(f'New Cases - {ma_days} day moving average')
     plt.xticks(rotation=90)
     plt.axvline('2020-04-07', color='red', linestyle='--')
@@ -1135,31 +1183,32 @@ def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-04-09', 15, 'Incubation Period')
     
-    plt.title('Brown County, WI New Cases')
+    plt.title('')
     plt.xlabel('Date')
     plt.tight_layout()
-    plt.savefig('plots/consequences.png', dpi=300)
-    
+    plt.savefig('plots/consequences_brown.png', dpi=300)
     
 
 def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:
     try:
-        print(len(df))
+        dummy = len(df)
     except:
         state_data = load_state_data()
         ky = select_states(state_data, 'Kentucky')
-        kynow = get_data_since_date(ky, '2020-03-06')
+        df = get_data_since_date(ky, '2020-03-06')
+    
+    if 'moving_ave' not in df.columns:
         if ma_days not in [3, 5, 7, 9]:
-            df = five_day_moving_average(kynow)
+            df = five_day_moving_average(df)
         else:
             if ma_days == 3:
-                df = three_day_moving_average(kynow)
+                df = three_day_moving_average(df)
             elif ma_days == 5:
-                df = five_day_moving_average(kynow)
+                df = five_day_moving_average(df)
             elif ma_days == 7:
-                df = seven_day_moving_average(kynow)
+                df = seven_day_moving_average(df)
             elif ma_days == 9:
-                df = nine_day_moving_average(kynow)
+                df = nine_day_moving_average(df)
                 
     plt.figure(figsize=(12, 6))
     sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
@@ -1174,8 +1223,7 @@ def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.title('Kentucky New Cases')
     plt.xlabel('Date')
     plt.tight_layout()
-    plt.savefig('plots/consequences.png', dpi=300)
-    
+    plt.savefig('plots/consequences_ky.png', dpi=300)    
         
     
 def make_state_counties_gif(state: str, date: str='default') -> None:
@@ -1284,7 +1332,7 @@ def make_state_counties_gif(state: str, date: str='default') -> None:
     imageio.mimsave(f'plots/{state}.gif', gif_images, duration=0.5)
     
     
-def make_nice_wi_gif():
+def make_nice_wi_gif(new_cases=False):
     
     state_data = load_state_data()
     state_data = state_data[state_data['state'] == 'Wisconsin']
@@ -1297,7 +1345,10 @@ def make_nice_wi_gif():
     
     state_df = get_data_since_date(state_df, '2020-03-08')
     
-    vmin, vmax = 0, state_df['cases'].max()
+    if new_cases:
+        vmin, vmax = 0, state_df['new_cases'].max()
+    else:
+        vmin, vmax = 0, state_df['cases'].max()
         
     basepath = os.path.join(os.getcwd(), 'resources/shapefiles/Wisconsin')
     plotpath = os.path.join(os.getcwd(), 'plots/wisconsin')
@@ -1327,7 +1378,7 @@ def make_nice_wi_gif():
         
         #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
         
-        variable = 'cases'
+        variable = 'cases' if new_cases == False else 'new_cases'
         
         fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
         
@@ -1387,7 +1438,10 @@ def make_nice_wi_gif():
     
     gif_images = [imageio.imread(x) for x in images]
     
-    imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
+    if new_cases:
+        imageio.mimsave('plots/wisconsin_new_cases.gif', gif_images, duration=0.5)
+    else:
+        imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
     
         
     
