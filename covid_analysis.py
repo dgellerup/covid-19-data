@@ -1066,8 +1066,9 @@ def _plot_county_moving_average(df: pd.DataFrame) -> None:
     
 
 def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
-    
-    if df == None:
+    try:
+        print(len(df))
+    except:
         state_data = load_state_data()
         wi = select_states(state_data, 'Wisconsin')
         winow = get_data_since_date(wi, '2020-03-08')
@@ -1100,6 +1101,81 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.xlabel('Date')
     plt.tight_layout()
     plt.savefig('plots/consequences.png', dpi=300)
+    
+
+def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
+    
+    if type(df) == "NoneType":
+        county_data = load_county_data()
+        wi = select_states(county_data, 'Wisconsin')
+        winow = get_data_since_date(wi, '2020-03-08')
+        brown = winow[winow['county'] == "Brown"]
+        if ma_days not in [3, 5, 7, 9]:
+            df = five_day_moving_average(brown)
+        else:
+            if ma_days == 3:
+                df = three_day_moving_average(brown)
+            elif ma_days == 5:
+                df = five_day_moving_average(brown)
+            elif ma_days == 7:
+                df = seven_day_moving_average(brown)
+            elif ma_days == 9:
+                df = nine_day_moving_average(brown)
+                
+    plt.figure(figsize=(12, 6))
+    sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
+    plt.ylabel(f'New Cases - {ma_days} day moving average')
+    plt.xticks(rotation=90)
+    plt.axvline('2020-04-07', color='red', linestyle='--')
+    plt.text('2020-04-01', 15, 'Wisconsin Primary')
+    plt.plot(['2020-04-04', '2020-04-07'], [15, 10], 'black', linewidth=1)
+    max_date = df['date'].max()
+    split_date = max_date.split("-")
+    incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-21' else '2020-04-21'
+    fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
+    plt.text('2020-04-09', 15, 'Incubation Period')
+    
+    plt.title('Brown County, WI New Cases')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    plt.savefig('plots/consequences.png', dpi=300)
+    
+    
+
+def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:
+    try:
+        print(len(df))
+    except:
+        state_data = load_state_data()
+        ky = select_states(state_data, 'Kentucky')
+        kynow = get_data_since_date(ky, '2020-03-06')
+        if ma_days not in [3, 5, 7, 9]:
+            df = five_day_moving_average(kynow)
+        else:
+            if ma_days == 3:
+                df = three_day_moving_average(kynow)
+            elif ma_days == 5:
+                df = five_day_moving_average(kynow)
+            elif ma_days == 7:
+                df = seven_day_moving_average(kynow)
+            elif ma_days == 9:
+                df = nine_day_moving_average(kynow)
+                
+    plt.figure(figsize=(12, 6))
+    sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
+    plt.ylabel(f'New Cases - {ma_days} day moving average')
+    plt.xticks(rotation=90)
+    plt.axvline('2020-04-17', color='red', linestyle='--')
+    plt.axvline('2020-04-15', color='red', linestyle='--')
+    plt.text('2020-04-11', 60, 'Kentucky Protests')
+    plt.plot(['2020-04-14', '2020-04-17'], [65, 80], 'black', linewidth=1)
+    plt.plot(['2020-04-14', '2020-04-15'], [65, 80], 'black', linewidth=1)
+    
+    plt.title('Kentucky New Cases')
+    plt.xlabel('Date')
+    plt.tight_layout()
+    plt.savefig('plots/consequences.png', dpi=300)
+    
         
     
 def make_state_counties_gif(state: str, date: str='default') -> None:
