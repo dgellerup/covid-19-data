@@ -773,13 +773,14 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     
 
 def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
+    # This is a dumb way of checking if a pd.DataFrame was provided.
     try:
         dummy = len(df)
     except:
         county_data = load_county_data()
         wi = select_states(county_data, 'Wisconsin')
         winow = get_data_since_date(wi, '2020-03-08')
-        df = winow[winow['county'] == 'Brown']
+        df = winow[winow['county'].isin(['Brown'])]
     
     if 'moving_ave' not in df.columns:
         if ma_days not in [3, 5, 7, 9]:
@@ -814,6 +815,7 @@ def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     
 
 def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:
+    # This is a dumb way of checking if a pd.DataFrame was provided.
     try:
         dummy = len(df)
     except:
