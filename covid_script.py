@@ -23,7 +23,6 @@ cov.plot_cases(manow)
 # Workflow to create deadliest counties plot
 county_data = cov.load_county_data()
 pcd = cov.counties_highest_per_capita_deaths(county_data, 10)
-cov.plot_per_capita_deaths(pcd)
 pcdnow = cov.get_data_since_date(pcd, '2020-03-15')
 cov.plot_per_capita_deaths(pcdnow)
 

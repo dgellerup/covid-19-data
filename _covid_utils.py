@@ -219,6 +219,8 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     else:
         num_col = 1
     
+    df.sort_values('deaths_per_10k', inplace=True, ascending=False)
+    
     plt.figure(figsize=(12, 6))
     
     sns.lineplot('date', 'deaths_per_10k', hue='county, state', data=df)
@@ -228,6 +230,7 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     plt.title('County Deaths per 10k People')
     plt.ylabel('Deaths/10k')
     plt.xlabel('Date')
+        
     plt.legend(fontsize=8)
     plt.tight_layout()
     plt.savefig('plots/deadly_counties.png', dpi=300)
