@@ -11,8 +11,8 @@ New cases in Brown County, WI (5 Day Moving Average)
 New cases in Kentucky (3 Day Moving Average)
 ![Kentucky Protests](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences_ky.png)
 
-Cases Per County in Wisconsin Since March 8, 2020  
-![Case Counts per County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin.gif)  
+New Cases Per 10k People by County in Wisconsin Since March 8, 2020  
+![New Cases Per 10k People by County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.gif)  
 
 Deadliest Counties in U.S.
 ![Deadliest Counties](https://github.com/dgellerup/covid-19-data/blob/master/plots/deadly_counties.png)  
