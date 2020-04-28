@@ -166,6 +166,7 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     plt.ylabel('Cases/100k')
     plt.xlabel('Date')
     plt.tight_layout()
+    plt.savefig('plots/plot.png', dpi=300)
     
 
 def _plot_deaths_per_capita_state(df: pd.DataFrame) -> None:

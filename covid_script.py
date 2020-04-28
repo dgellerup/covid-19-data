@@ -16,9 +16,9 @@ import covid_analysis as cov
 
 # Workflow to create most-affected states plot
 state_data = cov.load_state_data()
-ma = cov.states_with_most_cases(state_data, 5)
+ma = cov.states_highest_per_capita_cases(state_data, 5)
 manow = cov.get_data_since_date(ma, '2020-03-01')
-cov.plot_cases(manow)
+cov.plot_per_capita_cases(manow)
 
 # Workflow to create deadliest counties plot
 county_data = cov.load_county_data()
@@ -27,7 +27,7 @@ pcdnow = cov.get_data_since_date(pcd, '2020-03-15')
 cov.plot_per_capita_deaths(pcdnow)
 
 # Create Cases by County gif for Wisconsin
-cov.make_nice_wi_gif()
+cov.make_nice_wi_gif(True)
 
 # Create New Cases plot for the Wisconsin primary election
 cov.wisconsin_election()

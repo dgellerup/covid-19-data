@@ -758,8 +758,11 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.ylabel(f'New Cases - {ma_days} day moving average')
     plt.xticks(rotation=90)
     plt.axvline('2020-04-07', color='red', linestyle='--')
+    plt.axvline('2020-04-24', color='red', linestyle='--')
     plt.text('2020-04-01', 100, 'Wisconsin Primary')
+    plt.text('2020-04-18', 100, 'Wisconsin Protests')
     plt.plot(['2020-04-04', '2020-04-07'], [100, 80], 'black', linewidth=1)
+    plt.plot(['2020-04-21', '2020-04-24'], [100, 80], 'black', linewidth=1)
     max_date = df['date'].max()
     split_date = max_date.split("-")
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
@@ -971,10 +974,14 @@ def make_nice_wi_gif(new_cases=False):
     
     state_df = get_data_since_date(state_df, '2020-03-08')
     
+    state_df['new_cases_per_10k'] = state_df['new_cases'] / (state_df['population']/10000)
+    
     if new_cases:
-        vmin, vmax = 0, state_df['new_cases'].max()
+        vmin, vmax = 0, state_df['new_cases_per_10k'].max()
+        colormap = 'Reds'
     else:
         vmin, vmax = 0, state_df['cases'].max()
+        colormap = 'viridis'
         
     basepath = os.path.join(os.getcwd(), 'resources/shapefiles/Wisconsin')
     plotpath = os.path.join(os.getcwd(), 'plots/wisconsin')
@@ -1004,14 +1011,14 @@ def make_nice_wi_gif(new_cases=False):
         
         #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
         
-        variable = 'cases' if new_cases == False else 'new_cases'
+        variable = 'cases' if new_cases == False else 'new_cases_per_10k'
         
         fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
         
         ax0.set_aspect('equal')
         
         merged.plot(column=variable,
-                    cmap='viridis',
+                    cmap=colormap,
                     linewidth=0.8,
                     ax=ax0,
                     edgecolor='0.8',
@@ -1023,8 +1030,12 @@ def make_nice_wi_gif(new_cases=False):
         ax0.axis('off')
         
         # add a title
-        ax0.set_title(f"Cases by County {date}",
-                     fontdict={'fontsize': '18', 'fontweight' : '3'})
+        if new_cases:
+            ax0.set_title(f"New Cases per 10K People {date}",
+                          fontdict={'fontsize': '18', 'fontweight': '3'})
+        else:
+            ax0.set_title(f"Total Cases {date}",
+                          fontdict={'fontsize': '18', 'fontweight': '3'})
         
         # create an annotation for the data source
         ax0.annotate('Source: The New York Times, 2020',
@@ -1036,7 +1047,7 @@ def make_nice_wi_gif(new_cases=False):
                     color='#555555')
         
         # Create colorbar as a legend
-        sm = plt.cm.ScalarMappable(cmap='viridis', norm=plt.Normalize(vmin=vmin, vmax=vmax))
+        sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
         
         # empty array for the data range
         sm._A = []
