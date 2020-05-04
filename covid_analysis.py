@@ -759,15 +759,19 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.xticks(rotation=90)
     plt.axvline('2020-04-07', color='red', linestyle='--')
     plt.axvline('2020-04-24', color='red', linestyle='--')
-    plt.text('2020-04-01', 100, 'Wisconsin Primary')
-    plt.text('2020-04-18', 100, 'Wisconsin Protests')
+    plt.text('2020-03-31', 100, 'Wisconsin Primary')
+    plt.text('2020-04-17', 50, 'Wisconsin Protests')
     plt.plot(['2020-04-04', '2020-04-07'], [100, 80], 'black', linewidth=1)
-    plt.plot(['2020-04-21', '2020-04-24'], [100, 80], 'black', linewidth=1)
+    plt.plot(['2020-04-21', '2020-04-24'], [50, 30], 'black', linewidth=1)
     max_date = df['date'].max()
     split_date = max_date.split("-")
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
     fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-04-09', 100, 'Incubation Period')
+    
+    incubation_end_2 = f"{'-'.join(split_date[:2])}-{int(split_date[-1])-int(ma_days/2):02}" if df['date'].max() <= '2020-05-08' else '2020-04-07'
+    fill(['2020-04-25',incubation_end_2,incubation_end_2,'2020-04-25'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
+    plt.text('2020-04-26', 50, 'Incubation Period')
     
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
