@@ -638,13 +638,14 @@ def nine_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.Dat
 def fit_curve(iterable: Iterable, deg: int) -> List[int]:
     "This more or less does not work but I want to leave it here for future ref."
     x = range(0, len(iterable))
+    x_future = range(0, len(iterable)+14)
     y = iterable
     
     z = np.polyfit(x, y, deg)
     
     p = np.poly1d(z)
     
-    fit = [int(p(f)) for f in x]
+    fit = [int(p(f)) for f in x_future]
     
     return fit
 
@@ -776,7 +777,7 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     fill(['2020-04-25',incubation_end_2,incubation_end_2,'2020-04-25'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-04-26', 50, 'Incubation Period')
     
-    incubation_end_3 = '2020-05-18'
+    incubation_end_3 = '2020-05-19'
     fill(['2020-05-14',incubation_end_3, incubation_end_3, '2020-05-14'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-05-14', 150, 'Incubation Period')
     
