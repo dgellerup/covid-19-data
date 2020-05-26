@@ -777,9 +777,9 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     fill(['2020-04-25',incubation_end_2,incubation_end_2,'2020-04-25'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-04-26', 50, 'Incubation Period')
     
-    incubation_end_3 = '2020-05-22'
+    incubation_end_3 = '2020-05-23'
     fill(['2020-05-14',incubation_end_3, incubation_end_3, '2020-05-14'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
-    plt.text('2020-05-14', 150, 'Incubation Period')
+    plt.text('2020-05-14', 125, 'Incubation Period')
     
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
