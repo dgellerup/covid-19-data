@@ -27,7 +27,7 @@ pcdnow = cov.get_data_since_date(pcd, '2020-03-15')
 cov.plot_per_capita_deaths(pcdnow)
 
 # Create Cases by County gif for Wisconsin
-cov.make_nice_wi_gif(True)
+cov.make_nice_wi_gif()
 
 # Create New Cases plot for the Wisconsin primary election
 cov.wisconsin_election()
@@ -36,7 +36,7 @@ cov.wisconsin_election()
 cov.brown_county_election()
 
 # Create New Cases plot for Kentucky with protest dates labeled
-cov.kentucky_protests(ma_days=3)
+#cov.kentucky_protests(ma_days=3)
 
 
 

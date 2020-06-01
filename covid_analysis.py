@@ -777,7 +777,7 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     fill(['2020-04-25',incubation_end_2,incubation_end_2,'2020-04-25'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-04-26', 50, 'Incubation Period')
     
-    incubation_end_3 = '2020-05-26'
+    incubation_end_3 = '2020-05-27'
     fill(['2020-05-14',incubation_end_3, incubation_end_3, '2020-05-14'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     plt.text('2020-05-14', 125, 'Incubation Period')
     
@@ -988,12 +988,14 @@ def make_nice_wi_gif(new_cases=False):
     
     state_df['new_cases_per_10k'] = state_df['new_cases'] / (state_df['population']/10000)
     
+    state_df['cases_per_10k'] = state_df['cases'] / (state_df['population']/10000)
+    
     if new_cases:
         vmin, vmax = 0, state_df['new_cases_per_10k'].max()
         colormap = 'Reds'
     else:
-        vmin, vmax = 0, state_df['cases'].max()
-        colormap = 'viridis'
+        vmin, vmax = 0, state_df['cases_per_10k'].max()
+        colormap = 'Reds'
         
     basepath = os.path.join(os.getcwd(), 'resources/shapefiles/Wisconsin')
     plotpath = os.path.join(os.getcwd(), 'plots/wisconsin')
@@ -1023,7 +1025,7 @@ def make_nice_wi_gif(new_cases=False):
         
         #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
         
-        variable = 'cases' if new_cases == False else 'new_cases_per_10k'
+        variable = 'cases_per_10k' if new_cases == False else 'new_cases_per_10k'
         
         fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
         
@@ -1046,7 +1048,7 @@ def make_nice_wi_gif(new_cases=False):
             ax0.set_title(f"New Cases per 10K People {date}",
                           fontdict={'fontsize': '18', 'fontweight': '3'})
         else:
-            ax0.set_title(f"Total Cases {date}",
+            ax0.set_title(f"Cases per 10K People {date}",
                           fontdict={'fontsize': '18', 'fontweight': '3'})
         
         # create an annotation for the data source
@@ -1087,10 +1089,7 @@ def make_nice_wi_gif(new_cases=False):
     
     gif_images = [imageio.imread(x) for x in images]
     
-    if new_cases:
-        imageio.mimsave('plots/wisconsin_new_cases.gif', gif_images, duration=0.5)
-    else:
-        imageio.mimsave('plots/wisconsin.gif', gif_images, duration=0.5)
+    imageio.mimsave('plots/wisconsin_new_cases.gif', gif_images, duration=0.5)
     
         
     
