@@ -771,15 +771,15 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     split_date = max_date.split("-")
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
     fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
-    plt.text('2020-04-09', 100, 'Incubation Period')
+    plt.text('2020-04-09', 175, 'Incubation Period')
     
     incubation_end_2 = '2020-05-08'
     fill(['2020-04-25',incubation_end_2,incubation_end_2,'2020-04-25'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
-    plt.text('2020-04-26', 50, 'Incubation Period')
+    plt.text('2020-04-26', 75, 'Incubation Period')
     
     incubation_end_3 = '2020-05-27'
     fill(['2020-05-14',incubation_end_3, incubation_end_3, '2020-05-14'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
-    plt.text('2020-05-14', 125, 'Incubation Period')
+    plt.text('2020-05-15', 125, 'Incubation Period')
     
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
