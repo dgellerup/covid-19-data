@@ -1087,7 +1087,7 @@ def make_nice_wi_gif(new_cases=False):
         
     images = sorted(images)
     
-    gif_images = [imageio.imread(x) for x in images]
+    gif_images = [imageio.imread(images[x]) for x in range(0, len(images), 2)]
     
     imageio.mimsave('plots/wisconsin_new_cases.gif', gif_images, duration=0.5)
     
