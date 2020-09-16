@@ -7,6 +7,7 @@ Created on Tue Apr 21 16:22:10 2020
 """
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pandas as pd
 import seaborn as sns
 
@@ -156,11 +157,14 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     else:
         num_col = 1
     
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 6)
     
     sns.lineplot('date', 'cases_per_100k', hue='state', data=df)
     
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
+    ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(size=6, rotation=90)
     plt.title('State Cases per 100k People')
     plt.ylabel('Cases/100k')
@@ -220,11 +224,14 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     else:
         num_col = 1
     
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 6)
     
     sns.lineplot('date', 'deaths_per_10k', hue='county, state', data=df)
     
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
+    x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
+    ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(size=6, rotation=90)
     plt.title('County Deaths per 10k People')
     plt.ylabel('Deaths/10k')

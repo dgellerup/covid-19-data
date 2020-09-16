@@ -16,6 +16,7 @@ import imageio
 import matplotlib
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 from plotly.figure_factory import _county_choropleth as pleth
@@ -754,10 +755,14 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
             elif ma_days == 9:
                 df = nine_day_moving_average(df)
                 
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 6)
     sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
     plt.ylabel(f'New Cases - {ma_days} day moving average')
+    x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
+    ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(rotation=90)
+    
     plt.axvline('2020-04-07', color='red', linestyle='--')
     plt.axvline('2020-04-24', color='red', linestyle='--')
     plt.axvline('2020-05-13', color='red', linestyle='--')
@@ -770,8 +775,10 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.plot(['2020-04-21', '2020-04-24'], [500, 450], 'black', linewidth=1)
     plt.plot(['2020-05-10', '2020-05-13'], [50, 25], 'black', linewidth=1)
     plt.plot(['2020-07-27', '2020-08-01'], [400, 325], 'black', linewidth=1)
+    
     max_date = df['date'].max()
     split_date = max_date.split("-")
+    
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
     fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
     #plt.text('2020-04-09', 175, 'Incubation Period')
@@ -813,9 +820,12 @@ def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
             elif ma_days == 9:
                 df = nine_day_moving_average(df)
                 
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots()
+    fig.set_size_inches(12, 6)
     sns.lineplot('date', 'moving_ave', hue='county', data=df)
     plt.ylabel(f'New Cases - {ma_days} day moving average')
+    x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
+    ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(rotation=90)
     plt.axvline('2020-04-07', color='red', linestyle='--')
     plt.text('2020-04-01', 15, 'Wisconsin Primary')
@@ -824,7 +834,7 @@ def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     split_date = max_date.split("-")
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
     fill(['2020-04-08',incubation_end,incubation_end,'2020-04-08'], [0,0,df['moving_ave'].max(),df['moving_ave'].max()], 'r', alpha=0.2, edgecolor='r')
-    plt.text('2020-04-09', 15, 'Incubation Period')
+    #plt.text('2020-04-09', 15, 'Incubation Period')
     
     plt.title('')
     plt.xlabel('Date')
