@@ -734,7 +734,7 @@ def plot_moving_average(df: pd.DataFrame) -> None:
         cu._plot_state_moving_average(df)
     
 
-def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
+def wisconsin_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     try:
         dummy = len(df)
     except:
@@ -767,14 +767,17 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.axvline('2020-04-24', color='red', linestyle='--')
     plt.axvline('2020-05-13', color='red', linestyle='--')
     plt.axvline('2020-08-01', color='red', linestyle='--')
+    plt.axvline('2020-09-02', color='red', linestyle='--')
     plt.text('2020-03-30', 300, 'Wisconsin Primary')
     plt.text('2020-04-16', 500, 'Wisconsin Protests')
     plt.text('2020-04-28', 50, 'Stay At Home Order Overturned')
     plt.text('2020-07-18', 400, 'Mask Mandate Enacted')
+    plt.text('2020-08-19', 200, 'UW System Instruction Begins')
     plt.plot(['2020-04-04', '2020-04-07'], [300, 250], 'black', linewidth=1)
     plt.plot(['2020-04-21', '2020-04-24'], [500, 450], 'black', linewidth=1)
     plt.plot(['2020-05-10', '2020-05-13'], [50, 25], 'black', linewidth=1)
     plt.plot(['2020-07-27', '2020-08-01'], [400, 325], 'black', linewidth=1)
+    plt.plot(['2020-08-28', '2020-09-02'], [200, 150], 'black', linewidth=1)
     
     max_date = df['date'].max()
     split_date = max_date.split("-")
@@ -797,7 +800,7 @@ def wisconsin_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.savefig('plots/consequences.png', dpi=300)
     
 
-def brown_county_election(df: pd.DataFrame=None, ma_days: int=5) -> None:
+def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     # This is a dumb way of checking if a pd.DataFrame was provided.
     try:
         dummy = len(df)
