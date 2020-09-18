@@ -30,10 +30,10 @@ cov.plot_per_capita_deaths(pcdnow)
 cov.make_nice_wi_gif()
 
 # Create New Cases plot for the Wisconsin primary election
-cov.wisconsin_election()
+cov.wisconsin_new_cases()
 
 # Create New Cases plot for Brown County for the Wisconsin primary election
-cov.brown_county_election()
+cov.brown_county_new_cases()
 
 # Create New Cases plot for Kentucky with protest dates labeled
 #cov.kentucky_protests(ma_days=3)
