@@ -3,7 +3,7 @@ In this forked repo from the New York Times, I've written a module in Python wit
 The code used to make the plots below in located in covid_script.py. This is a good reference for how to use the basic functions of the covid_analysis.py module.  
 
 New cases in Wisconsin (5 Day Moving Average)
-![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png)
+![Wisconsin Election](/plots/consequences.png)
 
 New cases in Brown County, WI (5 Day Moving Average)  
 ![Brown County Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences_brown.png)  
