@@ -1,7 +1,7 @@
 # COVID-19 in Wisconsin and the United States
 
 New cases in Wisconsin (5 Day Moving Average)
-![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png)
+![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png?raw=true)
 
 New cases in Brown County, WI (5 Day Moving Average)
 ![Brown County Election](/covid-19-data/plots/consequences_brown.png)
