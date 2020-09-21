@@ -1,13 +1,13 @@
 # COVID-19 in Wisconsin and the United States
 
 New cases in Wisconsin (5 Day Moving Average)
-![Wisconsin Election](../plots/consequences.png)
+![Wisconsin Election](/plots/consequences.png)
 
 New cases in Brown County, WI (5 Day Moving Average)
-![Brown County Election](../plots/consequences_brown.png)
+![Brown County Election](/plots/consequences_brown.png)
 
 Cases Per 10k People by County in Wisconsin Since March 8, 2020
-![Cases Per 10k People by County in Wisconsin](../plots/wisconsin_new_cases.gif)
+![Cases Per 10k People by County in Wisconsin](/plots/wisconsin_new_cases.gif)
 
 Deadliest Counties in U.S.
 ![Deadliest Counties](../plots/deadly_counties.png)
