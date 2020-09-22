@@ -787,7 +787,7 @@ def wisconsin_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date')
     plt.tight_layout()
-    plt.savefig('plots/wisconsin_new_cases.png', dpi=300)
+    plt.savefig('plots/wisconsin_new_cases.svg')
     
 
 def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
@@ -819,7 +819,7 @@ def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.ylabel(f'New Cases - {ma_days} day moving average', fontsize=16)
     x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
-    plt.xticks(rotation=90)
+    plt.xticks(size=10, rotation=90)
     plt.axvline('2020-04-07', color='red', linestyle='--')
     plt.text('2020-04-01', 15, 'Wisconsin Primary')
     plt.plot(['2020-04-04', '2020-04-07'], [15, 10], 'black', linewidth=1)
@@ -832,7 +832,7 @@ def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.title('')
     plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
-    plt.savefig('plots/brown_county_new_cases.png', dpi=300)
+    plt.savefig('plots/brown_county_new_cases.svg')
     
 
 def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:
@@ -1021,79 +1021,87 @@ def make_nice_wi_gif(new_cases=False):
         
     images = []
     
-    for date in list(set(state_df['date'])):
+    plot_dates = sorted(list(set(state_df['date'])))
+    plot_dates = [plot_dates[i] for i in range(0, len(plot_dates), 3)]
+    
+    for date in plot_dates:
         
-        wi_state['era'] = wi_state['date'].apply(lambda x: 'old' if x <= date else 'new')
+        if not f'counties_{date}.png' in os.listdir(plotpath):
         
-        winow = state_df[state_df['date'] == date]
-
-        merged = map_df.set_index("COUNTY_FIP").join(winow.set_index('short_fips'))
-        
-        #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
-        
-        variable = 'cases_per_10k' if new_cases == False else 'new_cases_per_10k'
-        
-        fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
-        
-        ax0.set_aspect('equal')
-        
-        merged.plot(column=variable,
-                    cmap=colormap,
-                    linewidth=0.8,
-                    ax=ax0,
-                    edgecolor='0.8',
-                    vmin=vmin,
-                    vmax=vmax,
-                    missing_kwds={"color": "lightgrey"},
-                    figsize=(6, 2))
-        
-        ax0.axis('off')
-        
-        # add a title
-        if new_cases:
-            ax0.set_title(f"New Cases per 10K People {date}",
-                          fontdict={'fontsize': '18', 'fontweight': '3'})
-        else:
-            ax0.set_title(f"Cases per 10K People {date}",
-                          fontdict={'fontsize': '18', 'fontweight': '3'})
-        
-        # create an annotation for the data source
-        ax0.annotate('Source: The New York Times, 2020',
-                    xy=(0.1, 0.08),
-                    xycoords='figure fraction',
-                    horizontalalignment='left', 
-                    verticalalignment='top',
-                    fontsize=12,
-                    color='#555555')
-        
-        # Create colorbar as a legend
-        sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
-        
-        # empty array for the data range
-        sm._A = []
-        
-        # add the colorbar to the figure
-        cbar = fig.colorbar(sm, ax=ax0)
-        
-        sns.lineplot('date', 'cases', data=wi_state, ax=ax1, color='coral')
-        plt.fill_between(wi_state.date.values, wi_state.cases.values, color='coral')
-        plt.axvline(date)
-        ax1.spines['top'].set_visible(False)
-        ax1.spines['right'].set_visible(False)
-        ax1.spines['bottom'].set_visible(False)
-        ax1.spines['left'].set_visible(False)
-        ax1.axes.get_xaxis().set_visible(False)
-        ax1.set_ylabel('State Cases')
-        
-        fig.savefig(os.path.join(plotpath, f'counties_{date}.png'), dpi=300)
-        
-        plt.close(fig)
-        
+            wi_state['era'] = wi_state['date'].apply(lambda x: 'old' if x <= date else 'new')
+            
+            winow = state_df[state_df['date'] == date]
+    
+            merged = map_df.set_index("COUNTY_FIP").join(winow.set_index('short_fips'))
+            
+            #merged['cases'] = merged['cases'].apply(lambda x: 0 if pd.isnull(x) else x)
+            
+            variable = 'cases_per_10k' if new_cases == False else 'new_cases_per_10k'
+            
+            fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={'height_ratios': [4, 1]}, figsize=(9, 9))
+            
+            ax0.set_aspect('equal')
+            
+            merged.plot(column=variable,
+                        cmap=colormap,
+                        linewidth=0.8,
+                        ax=ax0,
+                        edgecolor='0.8',
+                        vmin=vmin,
+                        vmax=vmax,
+                        missing_kwds={"color": "lightgrey"},
+                        figsize=(6, 2))
+            
+            ax0.axis('off')
+            
+            # add a title
+            if new_cases:
+                ax0.set_title(f"New Cases per 10K People {date}",
+                              fontdict={'fontsize': '18', 'fontweight': '3'})
+            else:
+                ax0.set_title(f"Cases per 10K People {date}",
+                              fontdict={'fontsize': '18', 'fontweight': '3'})
+            
+            # create an annotation for the data source
+            ax0.annotate('Source: The New York Times, 2020',
+                        xy=(0.1, 0.08),
+                        xycoords='figure fraction',
+                        horizontalalignment='left', 
+                        verticalalignment='top',
+                        fontsize=12,
+                        color='#555555')
+            
+            # Create colorbar as a legend
+            sm = plt.cm.ScalarMappable(cmap=colormap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
+            
+            # empty array for the data range
+            sm._A = []
+            
+            # add the colorbar to the figure
+            cbar = fig.colorbar(sm, ax=ax0)
+            
+            sns.lineplot('date', 'cases', data=wi_state, ax=ax1, color='coral')
+            plt.fill_between(wi_state.date.values, wi_state.cases.values, color='coral')
+            plt.axvline(date)
+            ax1.spines['top'].set_visible(False)
+            ax1.spines['right'].set_visible(False)
+            ax1.spines['bottom'].set_visible(False)
+            ax1.spines['left'].set_visible(False)
+            ax1.axes.get_xaxis().set_visible(False)
+            ax1.set_ylabel('State Cases')
+            
+            fig.savefig(os.path.join(plotpath, f'counties_{date}.png'), dpi=300)
+            
+            
+            plt.close(fig)
+            
         images.append(os.path.join(plotpath, f'counties_{date}.png'))
         
     images = sorted(images)
     
-    gif_images = [imageio.imread(images[x]) for x in range(0, len(images), 3)]
+    gif_images = [imageio.imread(image) for image in images]
+    
+    
     
     imageio.mimsave('plots/wisconsin_new_cases.gif', gif_images, duration=0.5)
     
