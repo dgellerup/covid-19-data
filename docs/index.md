@@ -1,4 +1,4 @@
-# COVID-19 in Wisconsin and the United States
+# Plots
 
 New cases in Wisconsin (5 Day Moving Average)
 ![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/consequences.png?raw=true)
