@@ -56,7 +56,9 @@ def _plot_state_cases(df: pd.DataFrame) -> None:
     plt.ylabel('Cases')
     plt.xlabel('Date')
     plt.tight_layout()
-    plt.savefig('plots/plot.png', dpi=300)
+    #plt.savefig('plots/plot.png', dpi=300)
+    plt.legend(loc=2)
+    plt.savefig('plots/plot.png')
     
 
 def _plot_state_deaths(df: pd.DataFrame) -> None:
@@ -170,7 +172,9 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     plt.ylabel('Cases/100k')
     plt.xlabel('Date')
     plt.tight_layout()
-    plt.savefig('plots/plot.png', dpi=300)
+    #plt.savefig('plots/plot.png', dpi=300)
+    plt.legend(loc=2)
+    plt.savefig('plots/ma_states_cases.png')
     
 
 def _plot_deaths_per_capita_state(df: pd.DataFrame) -> None:

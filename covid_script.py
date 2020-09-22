@@ -32,7 +32,7 @@ cov.make_nice_wi_gif()
 # Create New Cases plot for the Wisconsin primary election
 cov.wisconsin_new_cases()
 
-# Create New Cases plot for Brown County for the Wisconsin primary election
+# Create New Cases plot for Brown County, Wisconsin
 cov.brown_county_new_cases()
 
 # Create New Cases plot for Kentucky with protest dates labeled
