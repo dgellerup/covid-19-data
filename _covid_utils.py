@@ -160,7 +160,7 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
         num_col = 1
     
     fig, ax = plt.subplots()
-    fig.set_size_inches(12, 6)
+    fig.set_size_inches(8, 4)
     
     sns.lineplot('date', 'cases_per_100k', hue='state', data=df)
     
@@ -168,9 +168,9 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(size=6, rotation=90)
-    plt.title('State Cases per 100k People')
-    plt.ylabel('Cases/100k')
-    plt.xlabel('Date')
+    plt.title('State Cases per 100k People', loc='center')
+    plt.ylabel('Cases/100k', fontsize=16)
+    plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
     #plt.savefig('plots/plot.png', dpi=300)
     plt.legend(loc=2)

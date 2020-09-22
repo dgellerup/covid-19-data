@@ -815,8 +815,8 @@ def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
                 
     fig, ax = plt.subplots()
     fig.set_size_inches(12, 6)
-    sns.lineplot('date', 'moving_ave', hue='county', data=df)
-    plt.ylabel(f'New Cases - {ma_days} day moving average')
+    sns.lineplot('date', 'moving_ave', hue='county', data=df, legend=False)
+    plt.ylabel(f'New Cases - {ma_days} day moving average', fontsize=16)
     x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(rotation=90)
@@ -830,7 +830,7 @@ def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     #plt.text('2020-04-09', 15, 'Incubation Period')
     
     plt.title('')
-    plt.xlabel('Date')
+    plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
     plt.savefig('plots/brown_county_new_cases.png', dpi=300)
     
