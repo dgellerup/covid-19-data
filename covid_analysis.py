@@ -758,10 +758,10 @@ def wisconsin_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     fig, ax = plt.subplots()
     fig.set_size_inches(12, 6)
     sns.lineplot('date', 'moving_ave', hue='state', data=df, legend=None)
-    plt.ylabel(f'New Cases - {ma_days} day moving average')
+    plt.ylabel(f'New Cases - {ma_days} day moving average', fontsize=16)
     x_ticks = [tick for tick in plt.xticks()[0] if tick % 4 == 0]
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
-    plt.xticks(rotation=90)
+    plt.xticks(size=10, rotation=90)
     
     plt.axvline('2020-04-07', color='red', linestyle='--')
     plt.axvline('2020-05-13', color='red', linestyle='--')
@@ -785,9 +785,9 @@ def wisconsin_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
          'r', alpha=0.2, edgecolor='r')
         
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
-    plt.xlabel('Date')
+    plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
-    plt.savefig('plots/wisconsin_new_cases.svg')
+    plt.savefig('plots/wisconsin_new_cases.svg', dpi=300)
     
 
 def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
@@ -832,7 +832,7 @@ def brown_county_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     plt.title('')
     plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
-    plt.savefig('plots/brown_county_new_cases.svg')
+    plt.savefig('plots/brown_county_new_cases.svg', dpi=300)
     
 
 def kentucky_protests(df: pd.DataFrame=None, ma_days: int=5) -> None:

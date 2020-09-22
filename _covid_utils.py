@@ -53,12 +53,12 @@ def _plot_state_cases(df: pd.DataFrame) -> None:
     plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=num_col)
     plt.xticks(size=10, rotation=90)
     plt.title('State Cases')
-    plt.ylabel('Cases')
-    plt.xlabel('Date')
+    plt.ylabel('Cases', fontsize=16)
+    plt.xlabel('Date', fontsize=16)
     plt.tight_layout()
     #plt.savefig('plots/plot.png', dpi=300)
     plt.legend(loc=2)
-    plt.savefig('plots/state_cases.svg')
+    plt.savefig('plots/state_cases.svg', dpi=300)
     
 
 def _plot_state_deaths(df: pd.DataFrame) -> None:
@@ -174,7 +174,7 @@ def _plot_cases_per_capita_state(df: pd.DataFrame) -> None:
     plt.tight_layout()
     #plt.savefig('plots/plot.png', dpi=300)
     plt.legend(loc=2)
-    plt.savefig('plots/ma_states_cases.svg')
+    plt.savefig('plots/ma_states_cases.svg', dpi=300)
     
 
 def _plot_deaths_per_capita_state(df: pd.DataFrame) -> None:
@@ -238,13 +238,13 @@ def _plot_deaths_per_capita_county(df: pd.DataFrame) -> None:
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(size=10, rotation=90)
     plt.title('County Deaths per 10k People')
-    plt.ylabel('Deaths/10k')
-    plt.xlabel('Date')
+    plt.ylabel('Deaths/10k', fontsize=16)
+    plt.xlabel('Date', fontsize=16)
         
     plt.legend(fontsize=8)
     plt.tight_layout()
     #plt.savefig('plots/deadly_counties.png', dpi=300)
-    plt.savefig('plots/deadly_counties.svg')
+    plt.savefig('plots/deadly_counties.svg', dpi=300)
     
 
 def _plot_new_cases_national(df: pd.DataFrame) -> None:
