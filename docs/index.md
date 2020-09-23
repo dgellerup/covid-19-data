@@ -14,3 +14,5 @@
 
 <p style="font-size: 150%; text-align: center;">Case Counts per 100k People for 5 Most-Affected States From March 1, 2020 to June 8, 2020</p>
 ![Case Counts for 5 Most-Affected States From March 1, 2020 to June 8, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/ma_states_cases.svg?raw=true)
+
+<a href="https://dgellerup.github.io/" class="btn">Home</a>
