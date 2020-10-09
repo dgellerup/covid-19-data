@@ -28,12 +28,14 @@ from zipfile import ZipFile
 
 import _covid_utils as cu
 
+"""
 st_to_state_name_dict = pleth.st_to_state_name_dict
 state_to_st_dict = pleth.state_to_st_dict
 
 us_bounds = pleth._create_us_counties_df(st_to_state_name_dict, state_to_st_dict)
 us_county_bounds = us_bounds[0]
 us_state_bounds = us_bounds[1]
+"""
 
 population_data = pd.read_csv('resources/population.csv')
 population_data = population_data[['STATE', 'COUNTY', 'STNAME', 'CTYNAME', 'POPESTIMATE2019']]
