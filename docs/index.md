@@ -9,6 +9,7 @@
   seamless="seamless"
   frameborder="0">
 </iframe>
+![Current cases](https://github.com/dgellerup/covid-19-data/blob/master/plots/wi_interactive.html)
 
 <p style="font-size: 150%; text-align: center;">Cases Per 10k People by County in Wisconsin Since March 8, 2020</p>
 ![Cases Per 10k People by County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.gif?raw=true)
