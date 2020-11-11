@@ -1,7 +1,8 @@
-# Plots
-
 <p style="font-size: 150%; text-align: center;">New cases in Wisconsin (5 Day Moving Average)</p>
 ![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.svg?raw=true)
+
+<p style="font-size: 150%; text-align: center;">Current Number of Total Cases</p>
+<iframe src="https://github.com/dgellerup/covid-19-data/blob/master/plots/wi_interactive.html" width="100%" title="Current Number of Total Cases"></iframe>
 
 <p style="font-size: 150%; text-align: center;">Cases Per 10k People by County in Wisconsin Since March 8, 2020</p>
 ![Cases Per 10k People by County in Wisconsin](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.gif?raw=true)
