@@ -16,12 +16,12 @@
 }
 
 div#content {
-  height: 800px;
+  height: 700px;
   width: 100%;
 }
 
 div#content iframe {
-  position: relative;
+  position: static;
   border: 0 solid;
   height: 1103px;
   width: 979px;
