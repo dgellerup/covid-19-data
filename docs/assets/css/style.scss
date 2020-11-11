@@ -16,19 +16,20 @@
 }
 
 div#content {
-  top: 80px;
-  left: 40px;
-  bottom: 25px;
-  min-width: 200px;
-  width: 40%;
+  height: 395px;
+  margin: auto;
+  overflow: hidden;
+  width: 770px;
 }
 
 div#content iframe {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
+  border: 0 solid;
+  height: 1103px;
+  margin-left: -110px;
+  margin-top: -385px;
+  width: 979px;
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+  -o-transform: scale(0.8);
+  -ms-transform: scale(0.8);
 }
