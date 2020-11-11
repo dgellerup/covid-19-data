@@ -12,6 +12,7 @@ import pandas as pd
 import seaborn as sns
 
 import covid_analysis as cov
+import covid_wi
 
 
 # Workflow to create most-affected states plot
@@ -21,10 +22,12 @@ manow = cov.get_data_since_date(ma, '2020-03-01')
 cov.plot_per_capita_cases(manow)
 
 # Workflow to create deadliest counties plot
+"""
 county_data = cov.load_county_data()
 pcd = cov.counties_highest_per_capita_deaths(county_data, 10)
 pcdnow = cov.get_data_since_date(pcd, '2020-03-15')
 cov.plot_per_capita_deaths(pcdnow)
+"""
 
 # Create Cases by County gif for Wisconsin
 cov.make_nice_wi_gif()
@@ -32,8 +35,10 @@ cov.make_nice_wi_gif()
 # Create New Cases plot for the Wisconsin primary election
 cov.wisconsin_new_cases()
 
+covid_wi.main()
+
 # Create New Cases plot for Brown County, Wisconsin
-cov.brown_county_new_cases()
+#cov.brown_county_new_cases()
 
 # Create New Cases plot for Kentucky with protest dates labeled
 #cov.kentucky_protests(ma_days=3)
