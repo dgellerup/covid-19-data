@@ -2,7 +2,7 @@
 ![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.svg?raw=true)
 
 <p style="font-size: 150%; text-align: center;">Current Number of Total Cases</p>
-<p>
+<p id="content">
   <iframe src="assets/img/wi_interactive.html"
     sandbox="allow-same-origin allow-scripts"
     scrolling="no"
