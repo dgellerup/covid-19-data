@@ -23,13 +23,10 @@ div#content {
 p#content iframe {
   position: static;
   border: 0 solid;
+  height: 100%;
   width: 100%;
   -webkit-transform: scale(0.8);
   -moz-transform: scale(0.8);
   -o-transform: scale(0.8);
   -ms-transform: scale(0.8);
-}
-
-iframe {
-  display:block;
 }
