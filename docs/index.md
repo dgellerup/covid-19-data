@@ -17,3 +17,8 @@
 
 <p style="font-size: 150%; text-align: center;">Case Counts per 100k People for 5 Most-Affected States From March 1, 2020 to June 8, 2020</p>
 ![Case Counts for 5 Most-Affected States From March 1, 2020 to June 8, 2020](https://github.com/dgellerup/covid-19-data/blob/master/plots/ma_states_cases.svg?raw=true)
+
+<p style="text-align: center;">Data Sources</p>
+![New York Times](https://github.com/nytimes/covid-19-data)
+![Wisconsin Department of Health Services](https://data.dhsgis.wi.gov/datasets/covid-19-historical-data-by-county/data?orderBy=GEOID)
+![NOAA](https://www.ncdc.noaa.gov/)
