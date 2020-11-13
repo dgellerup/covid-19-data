@@ -1,7 +1,7 @@
 <p style="font-size: 150%; text-align: center;">New cases in Wisconsin (5 Day Moving Average)</p>
 ![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.svg?raw=true)
 
-<p style="font-size: 150%; text-align: center;">Current Number of Total Cases</p>
+<p style="font-size: 150%; text-align: center;">Interactive County Map</p>
 <div id="content">
   <iframe src="assets/img/wi_interactive.html"
     sandbox="allow-same-origin allow-scripts"
