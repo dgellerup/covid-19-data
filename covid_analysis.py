@@ -500,10 +500,8 @@ def five_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.Dat
             else:
                 before_after = casted[i-2:i+3]
                 moving_ave.append(pd.Series(before_after).mean())
-            
-        df['moving_ave'] = moving_ave
         
-        return df
+        return moving_ave
 
 
 def seven_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.DataFrame:
@@ -632,10 +630,8 @@ def nine_day_moving_average(df: pd.DataFrame, metric: str="new_cases") -> pd.Dat
             else:
                 before_after = casted[i-4:i+5]
                 moving_ave.append(pd.Series(before_after).mean())
-            
-        df['moving_ave'] = moving_ave
         
-        return df
+        return moving_ave
     
 
 def fit_curve(iterable: Iterable, deg: int) -> List[int]:
