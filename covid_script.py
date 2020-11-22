@@ -48,9 +48,9 @@ with open('docs/_layouts/default.html', 'r') as layout:
     lines = layout.readlines()
 
 for i in range(len(lines)):
-    if '<h2 class="project-tagline">' in lines[i]:
+    if '<h2 id="updated"' in lines[i]:
         now = datetime.datetime.now()
-        newstring = '      <h2 class="project-tagline">Updated '
+        newstring = '      <h2 id="updated" class="project-tagline">Updated '
         newstring += f'{now.strftime("%A")}, {now.strftime("%B")} {now.day}</h2>\n'
         lines[i] = newstring
         
