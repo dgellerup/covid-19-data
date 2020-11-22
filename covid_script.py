@@ -6,6 +6,7 @@ Created on Fri Apr 17 12:08:15 2020
 @author: dgelleru
 """
 
+import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -42,6 +43,19 @@ covid_wi.main()
 
 # Create New Cases plot for Kentucky with protest dates labeled
 #cov.kentucky_protests(ma_days=3)
+
+with open('docs/_layouts/default.html', 'r') as layout:
+    lines = layout.readlines()
+
+for i in range(len(lines)):
+    if '<h2 class="project-name">' in lines[i]:
+        now = datetime.datetime.now()
+        newstring = '      <h2 class="project-name">Updated '
+        newstring += f'{now.strftime("%A")}, {now.strftime("%B")} {now.day}</h2>\n'
+        lines[i] = newstring
+        
+with open('docs/_layouts/default.html', 'w') as layout:
+    layout.writelines(lines)
 
 
 
