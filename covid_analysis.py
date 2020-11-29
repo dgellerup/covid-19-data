@@ -761,26 +761,28 @@ def wisconsin_new_cases(df: pd.DataFrame=None, ma_days: int=5) -> None:
     ax.xaxis.set_major_locator(ticker.FixedLocator(x_ticks))
     plt.xticks(size=10, rotation=90)
     
-    plt.axvline('2020-04-07', color='red', linestyle='--')
-    plt.axvline('2020-05-13', color='red', linestyle='--')
+    #plt.axvline('2020-04-07', color='red', linestyle='--')
+    #plt.axvline('2020-05-13', color='red', linestyle='--')
     plt.axvline('2020-08-01', color='red', linestyle='--')
     plt.axvline('2020-09-02', color='red', linestyle='--')
-    plt.text('2020-03-30', 300, 'Wisconsin Primary')
-    plt.text('2020-04-28', 50, 'Stay At Home Order Overturned')
-    plt.text('2020-07-18', 400, 'Mask Mandate Enacted')
-    plt.text('2020-08-19', 200, 'UW System Instruction Begins')
-    plt.plot(['2020-04-04', '2020-04-07'], [300, 250], 'black', linewidth=1)
-    plt.plot(['2020-05-10', '2020-05-13'], [50, 25], 'black', linewidth=1)
-    plt.plot(['2020-07-27', '2020-08-01'], [400, 325], 'black', linewidth=1)
-    plt.plot(['2020-08-28', '2020-09-02'], [200, 150], 'black', linewidth=1)
+    #plt.text('2020-03-30', 300, 'Wisconsin Primary')
+    #plt.text('2020-04-28', 50, 'Stay At Home Order Overturned')
+    plt.text('2020-06-18', 4000, 'Mask Mandate Enacted')
+    plt.text('2020-09-04', 6000, 'UW System Instruction Begins')
+    #plt.plot(['2020-04-04', '2020-04-07'], [300, 250], 'black', linewidth=1)
+    #plt.plot(['2020-05-10', '2020-05-13'], [50, 25], 'black', linewidth=1)
+    plt.plot(['2020-07-12', '2020-08-01'], [3985, 3800], 'black', linewidth=1)
+    plt.plot(['2020-09-30', '2020-09-02'], [5985, 5800], 'black', linewidth=1)
     
     max_date = df['date'].max()
     split_date = max_date.split("-")
     
+    """
     incubation_end = f"{'-'.join(split_date[:2])}-{str(int(split_date[-1])-int(ma_days/2))}" if df['date'].max() <= '2020-04-22' else '2020-04-21'
     fill(['2020-04-08', incubation_end, incubation_end, '2020-04-08'], 
          [0,0,df['moving_ave'].max(),df['moving_ave'].max()],
          'r', alpha=0.2, edgecolor='r')
+    """
         
     #plt.gca().legend(loc='center left', bbox_to_anchor=(1, 0.5), prop={'size':6}, ncol=1)
     plt.xlabel('Date', fontsize=16)
