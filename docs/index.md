@@ -1,5 +1,8 @@
-<p style="font-size: 150%; text-align: center;">New cases in Wisconsin (5 Day Moving Average)</p>
+<p style="font-size: 150%; text-align: center;">New Cases in Wisconsin (5 Day Moving Average)</p>
 ![Wisconsin Election](https://github.com/dgellerup/covid-19-data/blob/master/plots/wisconsin_new_cases.svg?raw=true)
+
+<p style="font-size: 150%; text-align: center;">Daily Cases vs Outside Air Comfort in Wisconsin (5 Day Moving Average)</p>
+![Wisconsin Climate](https://github.com/dgellerup/covid-19-data/blob/master/plots/cases_vs_temps.svg?raw=true)
 
 <p style="font-size: 150%; text-align: center;">Interactive County Map</p>
 <div id="content">
