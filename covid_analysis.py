@@ -1025,7 +1025,7 @@ def make_nice_wi_gif(new_cases=False):
     images = []
     
     plot_dates = sorted(list(set(state_df['date'])))
-    plot_dates = [plot_dates[i] for i in range(0, len(plot_dates), 3)]
+    plot_dates = [plot_dates[i] for i in range(0, len(plot_dates), 4)]
     
     for date in plot_dates:
     
