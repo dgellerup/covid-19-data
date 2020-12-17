@@ -1222,14 +1222,58 @@ def make_us_counties_gif(date: str='default') -> None:
     gif_images = [imageio.imread(x) for x in images]
     
     imageio.mimsave(f'plots/{state}.gif', gif_images, duration=0.5)
+        
     
     
-    
-    
-    
-    
-    
-    
+def groups_plot(groups_dict, show_plot=False):
+
+    filedf = pd.DataFrame(list(groups_dict.values())[0])
+    filedf.sort_values('reads', inplace=True, ascending=False)
+
+    xcol = int(math.sqrt(len(filedf)))+1
+
+    x = 1
+    y = xcol
+    xpositions = []
+    ypositions = []
+    for _ in range(len(filedf)):
+        xpos = x
+        ypos = y
+        xpositions.append(xpos)
+        ypositions.append(ypos)
+        x += 1
+        if x > xcol:
+            x = 1
+            y -= 1
+
+    if min(ypositions) != 1:
+        ypositions = [y-1 for y in ypositions]
+
+    filedf['x'] = xpositions
+    filedf['y'] = ypositions
+    filedf['reads_adjusted'] = filedf['reads'].apply(lambda x: int(x/xcol))
+    filedf['ids'] = filedf['ids'].apply(beautiful_ids)
+
+    source = ColumnDataSource(filedf)
+
+    TOOLS = "hover,save,pan,box_zoom,reset,wheel_zoom"
+
+    plot = figure(x_range=(0, xcol+1), y_range=(0, xcol+5), title='Groups Report',
+                  plot_height=900, plot_width=1200, tools=TOOLS, toolbar_location='below',
+                  tooltips=[('Group', '@ids'), ('Reads', '@reads')])
+    plot.xaxis.ticker = SingleIntervalTicker(interval=1)
+    plot.yaxis.ticker = SingleIntervalTicker(interval=1)
+    plot.xaxis.visible = False
+    plot.yaxis.visible = False
+    plot.xgrid.visible = False
+    plot.ygrid.visible = False
+
+    plot.circle(x='x', y='y', size='reads_adjusted', source=source, fill_color='red', fill_alpha=0.5, line_width=0)
+
+    if not show_plot:
+        save(plot, filename='bokeh_groups_figure.html', title="Groups Figure")
+    else:
+        show(plot)
     
 
     
